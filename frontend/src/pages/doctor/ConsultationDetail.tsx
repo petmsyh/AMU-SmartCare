@@ -8,6 +8,7 @@ import {
   updateConsultationStatus,
 } from '../../store/slices/consultationsSlice';
 import ChatWindow from '../../components/ChatWindow';
+import JoinCallButton from '../../components/JoinCallButton';
 
 const statusClasses: Record<string, string> = {
   pending: 'bg-orange-100 text-orange-700',
@@ -132,6 +133,20 @@ const DoctorConsultationDetail: React.FC = () => {
             </button>
           )}
         </div>
+
+        {isActive && consultation.scheduledAt && (
+          <div className="mt-4 pt-4 border-t border-gray-100">
+            <p className="text-xs text-gray-500 mb-2 font-semibold uppercase tracking-wide">
+              Join Scheduled Call
+            </p>
+            <JoinCallButton
+              appointmentId={consultation.id}
+              scheduledAt={consultation.scheduledAt}
+              hostUserId={consultation.doctorId}
+              participantUserIds={[consultation.patientId, consultation.doctorId]}
+            />
+          </div>
+        )}
       </div>
 
       {(isActive || isCompleted) && (
