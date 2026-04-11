@@ -6,7 +6,11 @@ import { TransactionType, TransactionStatus, TransactionMode, EscrowState, Consu
 import { logger } from '../../utils/logger';
 
 const COMMISSION_RATE_RAW = parseFloat(process.env.PLATFORM_COMMISSION_RATE || '0.10');
-const COMMISSION_RATE = COMMISSION_RATE_RAW >= 0 && COMMISSION_RATE_RAW <= 1 ? COMMISSION_RATE_RAW : 0.10;
+const COMMISSION_RATE = (() => {
+  if (COMMISSION_RATE_RAW >= 0 && COMMISSION_RATE_RAW <= 1) return COMMISSION_RATE_RAW;
+  logger.warn(`Invalid PLATFORM_COMMISSION_RATE="${process.env.PLATFORM_COMMISSION_RATE}", falling back to 0.10`);
+  return 0.10;
+})();
 const AUTO_RELEASE_HOURS = parseInt(process.env.AUTO_RELEASE_HOURS || '24', 10);
 
 export class MockPaymentService implements IPaymentService {
