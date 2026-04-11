@@ -44,7 +44,7 @@ const App: React.FC = () => {
 
   const defaultRoute = () => {
     if (!token) return <LandingPage />;
-    if (!user) return <div style={{ padding: 20, color: '#666' }}>Loading…</div>;
+    if (!user) return <div className="p-5 text-gray-500">Loading…</div>;
     const routes: Record<string, string> = {
       patient: '/patient',
       doctor: '/doctor',
