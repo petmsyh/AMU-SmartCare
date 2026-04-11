@@ -53,119 +53,56 @@ const AIAssistant: React.FC = () => {
   };
 
   return (
-    <div style={{ maxWidth: 680 }}>
-      <h2 style={{ margin: '0 0 8px', fontSize: 22 }}>🤖 AI Health Assistant</h2>
-      <div
-        style={{
-          background: '#fff3cd',
-          border: '1px solid #ffc107',
-          borderRadius: 6,
-          padding: '10px 14px',
-          marginBottom: 16,
-          fontSize: 13,
-          color: '#856404',
-        }}
-      >
+    <div className="max-w-[680px]">
+      <h2 className="mb-2 text-[22px] font-semibold">🤖 AI Health Assistant</h2>
+      <div className="bg-yellow-50 border border-yellow-400 rounded-md px-3.5 py-2.5 mb-4 text-[13px] text-yellow-800">
         ⚠️ <strong>Disclaimer:</strong> This AI assistant provides general health information only. It is NOT a
         substitute for professional medical advice, diagnosis, or treatment. Always consult a qualified healthcare
         provider for medical concerns.
       </div>
 
-      <div
-        style={{
-          background: '#fff',
-          border: '1px solid #e0e0e0',
-          borderRadius: 10,
-          display: 'flex',
-          flexDirection: 'column',
-          height: 480,
-          boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-        }}
-      >
-        <div
-          style={{
-            flex: 1,
-            overflowY: 'auto',
-            padding: 16,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 12,
-          }}
-        >
+      <div className="bg-white border border-gray-200 rounded-xl flex flex-col h-[480px] shadow-card">
+        <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3">
           {messages.map((msg, i) => (
             <div
               key={i}
-              style={{
-                alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start',
-                maxWidth: '75%',
-              }}
+              className={`max-w-[75%] ${msg.role === 'user' ? 'self-end' : 'self-start'}`}
             >
               <div
-                style={{
-                  background: msg.role === 'user' ? '#1a73e8' : '#f1f3f4',
-                  color: msg.role === 'user' ? '#fff' : '#333',
-                  padding: '10px 14px',
-                  borderRadius: msg.role === 'user' ? '12px 12px 0 12px' : '12px 12px 12px 0',
-                  fontSize: 14,
-                  lineHeight: 1.5,
-                  whiteSpace: 'pre-wrap',
-                  wordBreak: 'break-word',
-                }}
+                className={`px-3.5 py-2.5 text-sm leading-relaxed whitespace-pre-wrap break-words
+                  ${msg.role === 'user'
+                    ? 'bg-primary-500 text-white rounded-[12px_12px_0_12px]'
+                    : 'bg-gray-100 text-gray-800 rounded-[12px_12px_12px_0]'
+                  }`}
               >
                 {msg.content}
               </div>
-              <div style={{ fontSize: 11, color: '#999', marginTop: 2, textAlign: msg.role === 'user' ? 'right' : 'left' }}>
+              <div className={`text-[11px] text-gray-400 mt-0.5 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
                 {msg.role === 'user' ? 'You' : '🤖 AI Assistant'}
               </div>
             </div>
           ))}
           {loading && (
-            <div style={{ alignSelf: 'flex-start' }}>
-              <div
-                style={{
-                  background: '#f1f3f4',
-                  padding: '10px 14px',
-                  borderRadius: '12px 12px 12px 0',
-                  fontSize: 14,
-                  color: '#666',
-                }}
-              >
+            <div className="self-start">
+              <div className="bg-gray-100 px-3.5 py-2.5 rounded-[12px_12px_12px_0] text-sm text-gray-500">
                 Thinking…
               </div>
             </div>
           )}
         </div>
-        <div style={{ padding: 12, borderTop: '1px solid #e0e0e0', display: 'flex', gap: 8 }}>
+        <div className="p-3 border-t border-gray-200 flex gap-2">
           <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Ask a health question… (Enter to send)"
             rows={2}
-            style={{
-              flex: 1,
-              resize: 'none',
-              border: '1px solid #ddd',
-              borderRadius: 4,
-              padding: '8px 10px',
-              fontSize: 13,
-              fontFamily: 'inherit',
-            }}
+            className="flex-1 resize-none border border-gray-300 rounded px-2.5 py-2 text-[13px] font-[inherit]"
           />
           <button
             onClick={handleSend}
             disabled={loading || !input.trim()}
-            style={{
-              padding: '0 18px',
-              background: '#1a73e8',
-              color: '#fff',
-              border: 'none',
-              borderRadius: 4,
-              cursor: loading || !input.trim() ? 'not-allowed' : 'pointer',
-              opacity: loading || !input.trim() ? 0.6 : 1,
-              fontSize: 14,
-              fontWeight: 600,
-            }}
+            className={`btn btn-primary px-4 text-sm font-semibold ${loading || !input.trim() ? 'opacity-60 cursor-not-allowed' : ''}`}
           >
             Send
           </button>

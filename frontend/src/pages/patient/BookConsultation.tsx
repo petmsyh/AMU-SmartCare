@@ -43,87 +43,48 @@ const BookConsultation: React.FC = () => {
     navigate('/patient/consultations');
   };
 
-  const inputStyle: React.CSSProperties = {
-    width: '100%',
-    padding: '10px 12px',
-    border: '1px solid #ddd',
-    borderRadius: 6,
-    fontSize: 14,
-    marginBottom: 14,
-  };
-
-  if (!doctor) return <p style={{ color: '#666' }}>Loading doctor info…</p>;
+  if (!doctor) return <p className="text-gray-500">Loading doctor info…</p>;
   const fee = Number(doctor.consultationFee ?? 0);
   const safeFee = Number.isFinite(fee) ? fee : 0;
 
   return (
-    <div style={{ maxWidth: 520 }}>
+    <div className="max-w-[520px]">
       <button
         onClick={() => navigate(-1)}
-        style={{ background: 'none', border: 'none', color: '#1a73e8', cursor: 'pointer', fontSize: 14, marginBottom: 16, padding: 0 }}
+        className="bg-transparent border-0 text-primary-500 cursor-pointer text-sm mb-4 p-0"
       >
         ← Back
       </button>
 
-      <div
-        style={{
-          background: '#fff',
-          border: '1px solid #e0e0e0',
-          borderRadius: 10,
-          padding: 28,
-          boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-        }}
-      >
-        <h2 style={{ margin: '0 0 6px', fontSize: 20 }}>Book Consultation</h2>
-        <p style={{ margin: '0 0 20px', color: '#666', fontSize: 14 }}>
+      <div className="card">
+        <h2 className="mt-0 mb-1.5 text-xl font-semibold">Book Consultation</h2>
+        <p className="mt-0 mb-5 text-gray-500 text-sm">
           with <strong>{doctor.fullName}</strong> — {doctor.specialty}
         </p>
-        <div
-          style={{
-            background: '#e8f0fe',
-            padding: '10px 14px',
-            borderRadius: 6,
-            marginBottom: 20,
-            fontSize: 13,
-            color: '#1a73e8',
-          }}
-        >
+        <div className="bg-primary-50 text-primary-500 px-3.5 py-2.5 rounded-md mb-5 text-[13px]">
           Consultation Fee: <strong>₹{safeFee}</strong>
         </div>
 
         <form onSubmit={handleBook}>
-          <label style={{ fontSize: 13, fontWeight: 600, display: 'block', marginBottom: 4 }}>
-            Preferred Date & Time (optional)
-          </label>
+          <label className="form-label">Preferred Date &amp; Time (optional)</label>
           <input
             type="datetime-local"
             value={scheduledAt}
             onChange={(e) => setScheduledAt(e.target.value)}
-            style={inputStyle}
+            className="form-input"
           />
 
-          <label style={{ fontSize: 13, fontWeight: 600, display: 'block', marginBottom: 4 }}>
-            Notes / Symptoms
-          </label>
+          <label className="form-label">Notes / Symptoms</label>
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="Describe your symptoms or reason for consultation…"
             rows={4}
-            style={{ ...inputStyle, resize: 'vertical' }}
+            className="form-input resize-y"
           />
 
           {(error || submitError) && (
-            <div
-              style={{
-                background: '#fce8e6',
-                color: '#c5221f',
-                padding: '8px 12px',
-                borderRadius: 4,
-                marginBottom: 14,
-                fontSize: 13,
-              }}
-            >
+            <div className="bg-danger-100 text-danger-700 px-3 py-2 rounded mb-3.5 text-[13px]">
               {error || submitError}
             </div>
           )}
@@ -131,18 +92,7 @@ const BookConsultation: React.FC = () => {
           <button
             type="submit"
             disabled={loading}
-            style={{
-              width: '100%',
-              padding: '12px',
-              background: '#1a73e8',
-              color: '#fff',
-              border: 'none',
-              borderRadius: 6,
-              fontSize: 14,
-              fontWeight: 600,
-              cursor: loading ? 'not-allowed' : 'pointer',
-              opacity: loading ? 0.7 : 1,
-            }}
+            className={`btn btn-primary w-full py-3 text-sm font-semibold ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
           >
             {loading ? 'Booking…' : 'Continue to Payment'}
           </button>

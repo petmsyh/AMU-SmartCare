@@ -50,104 +50,59 @@ const AdminRatings: React.FC = () => {
 
   return (
     <div>
-      <h2 style={{ margin: '0 0 20px', fontSize: 22 }}>Rating Moderation</h2>
+      <h2 className="mb-5 text-[22px] font-semibold">Rating Moderation</h2>
 
       {actionMsg && (
-        <div
-          style={{
-            background: '#e8f5e9',
-            color: '#2e7d32',
-            padding: '8px 14px',
-            borderRadius: 6,
-            marginBottom: 14,
-            fontSize: 13,
-          }}
-        >
+        <div className="bg-success-100 text-success-700 px-3.5 py-2 rounded-md mb-3.5 text-[13px]">
           ✅ {actionMsg}
         </div>
       )}
 
-      {loading && <p style={{ color: '#666' }}>Loading ratings…</p>}
+      {loading && <p className="text-gray-500">Loading ratings…</p>}
       {error && (
-        <div style={{ background: '#fce8e6', color: '#c5221f', padding: '10px 14px', borderRadius: 6 }}>
+        <div className="bg-danger-100 text-danger-700 px-3.5 py-2.5 rounded-md">
           {error}
         </div>
       )}
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div className="flex flex-col gap-2.5">
         {ratings.map((r) => (
           <div
             key={r.id}
-            style={{
-              background: r.isHidden ? '#f8f8f8' : '#fff',
-              border: `1px solid ${r.isHidden ? '#ddd' : '#e0e0e0'}`,
-              borderRadius: 8,
-              padding: '14px 18px',
-              display: 'flex',
-              alignItems: 'flex-start',
-              justifyContent: 'space-between',
-              gap: 12,
-              opacity: r.isHidden ? 0.7 : 1,
-              boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
-            }}
+            className={`border rounded-lg px-[18px] py-3.5 flex items-start justify-between gap-3 shadow-sm
+              ${r.isHidden ? 'bg-gray-50 border-gray-300 opacity-70' : 'bg-white border-gray-200'}`}
           >
-            <div style={{ flex: 1 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1">
                 <RatingStars value={r.score} size={15} />
-                <span style={{ fontWeight: 600, fontSize: 14 }}>{r.score}/5</span>
+                <span className="font-semibold text-sm">{r.score}/5</span>
                 {r.isHidden && (
-                  <span
-                    style={{
-                      background: '#f5f5f5',
-                      color: '#757575',
-                      fontSize: 10,
-                      padding: '1px 6px',
-                      borderRadius: 8,
-                      fontWeight: 600,
-                    }}
-                  >
+                  <span className="bg-gray-100 text-gray-500 text-[10px] px-1.5 py-0.5 rounded-full font-semibold">
                     HIDDEN
                   </span>
                 )}
               </div>
-              <div style={{ fontSize: 12, color: '#666', marginBottom: 4 }}>
+              <div className="text-xs text-gray-500 mb-1">
                 Patient: <strong>{r.patient?.username || r.patientId}</strong> &bull; Doctor ID:{' '}
                 {r.doctorId} &bull; {new Date(r.createdAt).toLocaleDateString()}
               </div>
               {r.comment && (
-                <p style={{ margin: 0, fontSize: 13, color: '#555', fontStyle: 'italic' }}>
-                  "{r.comment}"
+                <p className="m-0 text-[13px] text-gray-600 italic">
+                  &ldquo;{r.comment}&rdquo;
                 </p>
               )}
             </div>
-            <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+            <div className="flex gap-1.5 flex-shrink-0">
               <button
                 onClick={() => handleHide(r.id, r.isHidden)}
-                style={{
-                  padding: '5px 12px',
-                  background: r.isHidden ? '#34a853' : '#fbbc04',
-                  color: r.isHidden ? '#fff' : '#333',
-                  border: 'none',
-                  borderRadius: 4,
-                  cursor: 'pointer',
-                  fontSize: 11,
-                  fontWeight: 600,
-                }}
+                className={`px-3 py-1 border-0 rounded cursor-pointer text-[11px] font-semibold
+                  ${r.isHidden ? 'bg-success-500 text-white' : 'bg-accent-400 text-gray-800'}`}
               >
                 {r.isHidden ? 'Show' : 'Hide'}
               </button>
               <button
                 onClick={() => handleDelete(r.id)}
-                style={{
-                  padding: '5px 12px',
-                  background: '#ea4335',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: 4,
-                  cursor: 'pointer',
-                  fontSize: 11,
-                  fontWeight: 600,
-                }}
+                className="btn btn-danger px-3 py-1 text-[11px] font-semibold"
               >
                 Delete
               </button>
@@ -155,7 +110,7 @@ const AdminRatings: React.FC = () => {
           </div>
         ))}
         {!loading && ratings.length === 0 && (
-          <p style={{ color: '#666', textAlign: 'center', padding: 20 }}>No ratings found.</p>
+          <p className="text-gray-500 text-center py-5">No ratings found.</p>
         )}
       </div>
     </div>

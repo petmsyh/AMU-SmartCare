@@ -3,6 +3,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '../../store';
 import { fetchWallet, fetchTransactions, withdrawFunds } from '../../store/slices/paymentsSlice';
 
+const typeColorClasses: Record<string, string> = {
+  payment: 'text-success-500',
+  escrow_hold: 'text-primary-500',
+  escrow_release: 'text-primary-900',
+  refund: 'text-danger-500',
+  withdrawal: 'text-orange-700',
+  commission: 'text-purple-700',
+};
+
 const DoctorWallet: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { wallet, transactions, loading, error } = useSelector((state: RootState) => state.payments);
@@ -48,50 +57,22 @@ const DoctorWallet: React.FC = () => {
     }
   };
 
-  const typeColors: Record<string, string> = {
-    payment: '#34a853',
-    escrow_hold: '#1a73e8',
-    escrow_release: '#0d47a1',
-    refund: '#ea4335',
-    withdrawal: '#e65100',
-    commission: '#6a1b9a',
-  };
-
   return (
-    <div style={{ maxWidth: 700 }}>
-      <h2 style={{ margin: '0 0 20px', fontSize: 22 }}>My Wallet</h2>
+    <div className="max-w-[700px]">
+      <h2 className="mb-5 text-[22px] font-semibold">My Wallet</h2>
 
-      <div
-        style={{
-          background: 'linear-gradient(135deg, #1a73e8, #0d47a1)',
-          borderRadius: 12,
-          padding: '24px 28px',
-          color: '#fff',
-          marginBottom: 20,
-        }}
-      >
-        <div style={{ fontSize: 13, opacity: 0.8, marginBottom: 4 }}>Available Balance</div>
-        <div style={{ fontSize: 36, fontWeight: 700 }}>
+      <div className="bg-gradient-to-br from-primary-500 to-primary-900 rounded-xl px-7 py-6 text-white mb-5">
+        <div className="text-[13px] opacity-80 mb-1">Available Balance</div>
+        <div className="text-[36px] font-bold">
           {loading ? '…' : `₹${formattedBalance}`}
         </div>
       </div>
 
-      <div
-        style={{
-          background: '#fff',
-          border: '1px solid #e0e0e0',
-          borderRadius: 10,
-          padding: 24,
-          marginBottom: 20,
-          boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-        }}
-      >
-        <h3 style={{ margin: '0 0 16px', fontSize: 16 }}>Withdraw Funds</h3>
-        <form onSubmit={handleWithdraw} style={{ display: 'flex', gap: 10, alignItems: 'flex-end' }}>
-          <div style={{ flex: 1 }}>
-            <label style={{ fontSize: 12, fontWeight: 600, display: 'block', marginBottom: 4 }}>
-              Amount (₹)
-            </label>
+      <div className="card mb-5">
+        <h3 className="mt-0 mb-4 text-base font-semibold">Withdraw Funds</h3>
+        <form onSubmit={handleWithdraw} className="flex gap-2.5 items-end">
+          <div className="flex-1">
+            <label className="form-label text-xs">Amount (₹)</label>
             <input
               type="number"
               min="1"
@@ -99,93 +80,66 @@ const DoctorWallet: React.FC = () => {
               value={withdrawAmount}
               onChange={(e) => setWithdrawAmount(e.target.value)}
               placeholder="Enter amount"
-              style={{ width: '100%', padding: '9px 12px', border: '1px solid #ddd', borderRadius: 6, fontSize: 14 }}
+              className="form-input mb-0"
             />
           </div>
           <button
             type="submit"
             disabled={withdrawing}
-            style={{
-              padding: '9px 20px',
-              background: '#34a853',
-              color: '#fff',
-              border: 'none',
-              borderRadius: 6,
-              cursor: withdrawing ? 'not-allowed' : 'pointer',
-              fontWeight: 600,
-              fontSize: 14,
-              opacity: withdrawing ? 0.7 : 1,
-              whiteSpace: 'nowrap',
-            }}
+            className={`btn bg-success-500 text-white border-0 font-semibold whitespace-nowrap ${withdrawing ? 'opacity-70 cursor-not-allowed' : ''}`}
           >
             {withdrawing ? 'Processing…' : 'Withdraw'}
           </button>
         </form>
         {withdrawError && (
-          <div style={{ background: '#fce8e6', color: '#c5221f', padding: '6px 10px', borderRadius: 4, marginTop: 10, fontSize: 13 }}>
+          <div className="bg-danger-100 text-danger-700 px-2.5 py-1.5 rounded mt-2.5 text-[13px]">
             {withdrawError}
           </div>
         )}
         {withdrawSuccess && (
-          <div style={{ background: '#e8f5e9', color: '#2e7d32', padding: '6px 10px', borderRadius: 4, marginTop: 10, fontSize: 13 }}>
+          <div className="bg-success-100 text-success-700 px-2.5 py-1.5 rounded mt-2.5 text-[13px]">
             ✅ {withdrawSuccess}
           </div>
         )}
         {error && (
-          <div style={{ background: '#fce8e6', color: '#c5221f', padding: '6px 10px', borderRadius: 4, marginTop: 10, fontSize: 13 }}>
+          <div className="bg-danger-100 text-danger-700 px-2.5 py-1.5 rounded mt-2.5 text-[13px]">
             {error}
           </div>
         )}
       </div>
 
-      <div
-        style={{
-          background: '#fff',
-          border: '1px solid #e0e0e0',
-          borderRadius: 10,
-          padding: 24,
-          boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-        }}
-      >
-        <h3 style={{ margin: '0 0 16px', fontSize: 16 }}>Transaction History</h3>
-        {loading && <p style={{ color: '#666', fontSize: 13 }}>Loading transactions…</p>}
+      <div className="card">
+        <h3 className="mt-0 mb-4 text-base font-semibold">Transaction History</h3>
+        {loading && <p className="text-gray-500 text-[13px]">Loading transactions…</p>}
         {transactions.length === 0 && !loading && (
-          <p style={{ color: '#666', fontSize: 13 }}>No transactions yet.</p>
+          <p className="text-gray-500 text-[13px]">No transactions yet.</p>
         )}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {transactions.map((tx) => (
-            <div
-              key={tx.id}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '10px 0',
-                borderBottom: '1px solid #f0f0f0',
-              }}
-            >
-              <div>
-                <div style={{ fontWeight: 600, fontSize: 13, color: typeColors[tx.type] || '#333' }}>
-                  {tx.type.replace('_', ' ').toUpperCase()}
+        <div className="flex flex-col gap-2">
+          {transactions.map((tx) => {
+            const typeClass = typeColorClasses[tx.type] ?? 'text-gray-800';
+            const isCredit = ['payment', 'escrow_release'].includes(tx.type);
+            return (
+              <div
+                key={tx.id}
+                className="flex items-center justify-between py-2.5 border-b border-gray-100"
+              >
+                <div>
+                  <div className={`font-semibold text-[13px] ${typeClass}`}>
+                    {tx.type.replace('_', ' ').toUpperCase()}
+                  </div>
+                  <div className="text-[11px] text-gray-500 mt-0.5">
+                    {tx.description || '—'} &bull; {new Date(tx.createdAt).toLocaleString()}
+                  </div>
                 </div>
-                <div style={{ fontSize: 11, color: '#666', marginTop: 2 }}>
-                  {tx.description || '—'} &bull; {new Date(tx.createdAt).toLocaleString()}
+                <div className="text-right">
+                  <div className={`font-bold text-sm ${isCredit ? 'text-success-500' : 'text-danger-500'}`}>
+                    {isCredit ? '+' : '-'}₹{formatAmount(tx.amount)}
+                  </div>
+                  <div className="text-[11px] text-gray-400">{tx.status}</div>
                 </div>
               </div>
-              <div style={{ textAlign: 'right' }}>
-                <div
-                  style={{
-                    fontWeight: 700,
-                    fontSize: 14,
-                    color: ['payment', 'escrow_release'].includes(tx.type) ? '#34a853' : '#ea4335',
-                  }}
-                >
-                  {['payment', 'escrow_release'].includes(tx.type) ? '+' : '-'}₹{formatAmount(tx.amount)}
-                </div>
-                <div style={{ fontSize: 11, color: '#888' }}>{tx.status}</div>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>

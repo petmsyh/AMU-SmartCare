@@ -10,6 +10,16 @@ import {
 import ChatWindow from '../../components/ChatWindow';
 import RatingStars from '../../components/RatingStars';
 
+const statusClasses: Record<string, string> = {
+  pending: 'bg-orange-100 text-orange-700',
+  accepted: 'bg-success-100 text-success-700',
+  declined: 'bg-danger-100 text-danger-700',
+  in_progress: 'bg-blue-100 text-blue-700',
+  completed: 'bg-purple-100 text-purple-700',
+  cancelled: 'bg-gray-100 text-gray-600',
+  disputed: 'bg-pink-100 text-pink-700',
+};
+
 const PatientConsultationDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const dispatch = useDispatch<AppDispatch>();
@@ -52,9 +62,9 @@ const PatientConsultationDetail: React.FC = () => {
     }
   };
 
-  if (loading) return <p style={{ color: '#666' }}>Loading…</p>;
+  if (loading) return <p className="text-gray-500">Loading…</p>;
   if (error) return (
-    <div style={{ background: '#fce8e6', color: '#c5221f', padding: '10px 14px', borderRadius: 6 }}>
+    <div className="bg-danger-100 text-danger-700 px-3.5 py-2.5 rounded-md">
       {error}
     </div>
   );
@@ -64,72 +74,43 @@ const PatientConsultationDetail: React.FC = () => {
   const isActive = ['accepted', 'in_progress'].includes(consultation.status);
   const patientAlreadyConfirmed = consultation.patientConfirmed;
 
-  const statusColors: Record<string, { bg: string; color: string }> = {
-    pending: { bg: '#fff3e0', color: '#e65100' },
-    accepted: { bg: '#e8f5e9', color: '#2e7d32' },
-    declined: { bg: '#fce8e6', color: '#c5221f' },
-    in_progress: { bg: '#e3f2fd', color: '#1565c0' },
-    completed: { bg: '#f3e5f5', color: '#6a1b9a' },
-    cancelled: { bg: '#f5f5f5', color: '#757575' },
-    disputed: { bg: '#fce4ec', color: '#880e4f' },
-  };
-
-  const s = statusColors[consultation.status] || { bg: '#f5f5f5', color: '#333' };
+  const badgeClass = statusClasses[consultation.status] ?? 'bg-gray-100 text-gray-600';
 
   return (
-    <div style={{ maxWidth: 700 }}>
+    <div className="max-w-[700px]">
       <button
         onClick={() => navigate(-1)}
-        style={{ background: 'none', border: 'none', color: '#1a73e8', cursor: 'pointer', fontSize: 14, marginBottom: 16, padding: 0 }}
+        className="bg-transparent border-0 text-primary-500 cursor-pointer text-sm mb-4 p-0"
       >
         ← Back to Consultations
       </button>
 
-      <div
-        style={{
-          background: '#fff',
-          border: '1px solid #e0e0e0',
-          borderRadius: 10,
-          padding: 24,
-          marginBottom: 16,
-          boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-          <h2 style={{ margin: 0, fontSize: 20 }}>Consultation Detail</h2>
-          <span
-            style={{
-              background: s.bg,
-              color: s.color,
-              padding: '4px 12px',
-              borderRadius: 12,
-              fontSize: 12,
-              fontWeight: 600,
-              textTransform: 'capitalize',
-            }}
-          >
+      <div className="card mb-4">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="m-0 text-xl font-semibold">Consultation Detail</h2>
+          <span className={`${badgeClass} px-3 py-1 rounded-full text-xs font-semibold capitalize`}>
             {consultation.status.replace('_', ' ')}
           </span>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 16 }}>
+        <div className="grid grid-cols-2 gap-2.5 mb-4">
           {[
             { label: 'Doctor', value: consultation.doctor?.username || consultation.doctorId },
             { label: 'Scheduled', value: consultation.scheduledAt ? new Date(consultation.scheduledAt).toLocaleString() : 'Not set' },
             { label: 'Patient Confirmed', value: consultation.patientConfirmed ? '✅ Yes' : '⏳ No' },
             { label: 'Doctor Confirmed', value: consultation.doctorConfirmed ? '✅ Yes' : '⏳ No' },
           ].map((item) => (
-            <div key={item.label} style={{ background: '#f8f9fa', padding: '10px 12px', borderRadius: 6 }}>
-              <div style={{ fontSize: 11, color: '#666', marginBottom: 2, fontWeight: 600 }}>{item.label}</div>
-              <div style={{ fontSize: 13, fontWeight: 500 }}>{item.value}</div>
+            <div key={item.label} className="bg-gray-50 px-3 py-2.5 rounded-md">
+              <div className="text-[11px] text-gray-500 mb-0.5 font-semibold">{item.label}</div>
+              <div className="text-[13px] font-medium">{item.value}</div>
             </div>
           ))}
         </div>
 
         {consultation.notes && (
-          <div style={{ background: '#f8f9fa', padding: '10px 12px', borderRadius: 6, marginBottom: 16 }}>
-            <div style={{ fontSize: 11, color: '#666', marginBottom: 4, fontWeight: 600 }}>Notes</div>
-            <p style={{ margin: 0, fontSize: 13, color: '#555' }}>{consultation.notes}</p>
+          <div className="bg-gray-50 px-3 py-2.5 rounded-md mb-4">
+            <div className="text-[11px] text-gray-500 mb-1 font-semibold">Notes</div>
+            <p className="m-0 text-[13px] text-gray-600">{consultation.notes}</p>
           </div>
         )}
 
@@ -137,17 +118,8 @@ const PatientConsultationDetail: React.FC = () => {
           <button
             onClick={handleConfirm}
             disabled={confirming}
-            style={{
-              padding: '8px 20px',
-              background: '#34a853',
-              color: '#fff',
-              border: 'none',
-              borderRadius: 4,
-              cursor: confirming ? 'not-allowed' : 'pointer',
-              fontSize: 13,
-              fontWeight: 600,
-              opacity: confirming ? 0.7 : 1,
-            }}
+            className={`btn bg-success-500 text-white border-0 px-5 py-2 text-[13px] font-semibold
+              ${confirming ? 'opacity-70 cursor-not-allowed' : ''}`}
           >
             {confirming ? 'Confirming…' : 'Confirm Completion'}
           </button>
@@ -155,23 +127,15 @@ const PatientConsultationDetail: React.FC = () => {
       </div>
 
       {(isActive || isCompleted) && (
-        <div style={{ marginBottom: 16 }}>
+        <div className="mb-4">
           <ChatWindow consultationId={consultation.id} disabled={isCompleted} />
         </div>
       )}
 
       {isCompleted && !ratingSubmitted && (
-        <div
-          style={{
-            background: '#fff',
-            border: '1px solid #e0e0e0',
-            borderRadius: 10,
-            padding: 24,
-            boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-          }}
-        >
-          <h3 style={{ margin: '0 0 12px', fontSize: 16 }}>Rate Your Doctor</h3>
-          <div style={{ marginBottom: 12 }}>
+        <div className="card">
+          <h3 className="mt-0 mb-3 text-base font-semibold">Rate Your Doctor</h3>
+          <div className="mb-3">
             <RatingStars value={ratingScore} onChange={setRatingScore} size={28} />
           </div>
           <textarea
@@ -179,34 +143,16 @@ const PatientConsultationDetail: React.FC = () => {
             onChange={(e) => setRatingComment(e.target.value)}
             placeholder="Leave a comment (optional)…"
             rows={3}
-            style={{
-              width: '100%',
-              padding: '8px 12px',
-              border: '1px solid #ddd',
-              borderRadius: 4,
-              fontSize: 13,
-              resize: 'vertical',
-              marginBottom: 12,
-              fontFamily: 'inherit',
-            }}
+            className="form-input resize-y mb-3"
           />
           {ratingError && (
-            <div style={{ background: '#fce8e6', color: '#c5221f', padding: '6px 10px', borderRadius: 4, marginBottom: 8, fontSize: 13 }}>
+            <div className="bg-danger-100 text-danger-700 px-2.5 py-1.5 rounded mb-2 text-[13px]">
               {ratingError}
             </div>
           )}
           <button
             onClick={handleRate}
-            style={{
-              padding: '8px 20px',
-              background: '#f4b400',
-              color: '#333',
-              border: 'none',
-              borderRadius: 4,
-              cursor: 'pointer',
-              fontSize: 13,
-              fontWeight: 600,
-            }}
+            className="btn bg-accent-400 text-gray-800 border-0 px-5 py-2 text-[13px] font-semibold"
           >
             Submit Rating
           </button>
@@ -214,15 +160,7 @@ const PatientConsultationDetail: React.FC = () => {
       )}
 
       {ratingSubmitted && (
-        <div
-          style={{
-            background: '#e8f5e9',
-            color: '#2e7d32',
-            padding: '12px 16px',
-            borderRadius: 8,
-            fontWeight: 600,
-          }}
-        >
+        <div className="bg-success-100 text-success-700 px-4 py-3 rounded-lg font-semibold">
           ✅ Thank you for your rating!
         </div>
       )}

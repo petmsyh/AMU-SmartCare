@@ -7,6 +7,12 @@ import RatingStars from '../../components/RatingStars';
 import api from '../../api/axios';
 import { Rating } from '../../types';
 
+const tierClasses: Record<string, string> = {
+  GeneralPractitioner: 'bg-success-100 text-success-500',
+  Specialist: 'bg-primary-50 text-primary-500',
+  SuperSpecialist: 'bg-purple-100 text-purple-500',
+};
+
 const DoctorProfile: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const dispatch = useDispatch<AppDispatch>();
@@ -21,9 +27,9 @@ const DoctorProfile: React.FC = () => {
     }
   }, [id, dispatch]);
 
-  if (loading) return <p style={{ color: '#666' }}>Loading doctor profile…</p>;
+  if (loading) return <p className="text-gray-500">Loading doctor profile…</p>;
   if (error) return (
-    <div style={{ background: '#fce8e6', color: '#c5221f', padding: '10px 14px', borderRadius: 6 }}>
+    <div className="bg-danger-100 text-danger-700 px-3.5 py-2.5 rounded-md">
       {error}
     </div>
   );
@@ -34,132 +40,79 @@ const DoctorProfile: React.FC = () => {
   const safeConsultationFee = Number.isFinite(consultationFee) ? consultationFee : 0;
   const safeAverageRating = Number.isFinite(averageRating) ? averageRating : 0;
 
-  const tierColor: Record<string, string> = {
-    GeneralPractitioner: '#34a853',
-    Specialist: '#1a73e8',
-    SuperSpecialist: '#9c27b0',
-  };
-
   return (
-    <div style={{ maxWidth: 720 }}>
+    <div className="max-w-[720px]">
       <button
         onClick={() => navigate(-1)}
-        style={{ background: 'none', border: 'none', color: '#1a73e8', cursor: 'pointer', fontSize: 14, marginBottom: 16, padding: 0 }}
+        className="bg-transparent border-0 text-primary-500 cursor-pointer text-sm mb-4 p-0"
       >
         ← Back
       </button>
 
-      <div
-        style={{
-          background: '#fff',
-          border: '1px solid #e0e0e0',
-          borderRadius: 10,
-          padding: 28,
-          marginBottom: 20,
-          boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-        }}
-      >
-        <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start', marginBottom: 20 }}>
-          <div
-            style={{
-              width: 80,
-              height: 80,
-              borderRadius: '50%',
-              background: '#e8f0fe',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 36,
-              flexShrink: 0,
-            }}
-          >
+      <div className="card mb-5">
+        <div className="flex gap-5 items-start mb-5">
+          <div className="w-20 h-20 rounded-full bg-primary-50 flex items-center justify-center text-4xl flex-shrink-0">
             👨‍⚕️
           </div>
           <div>
-            <h2 style={{ margin: '0 0 6px', fontSize: 22 }}>{doctor.fullName}</h2>
-            <p style={{ margin: '0 0 8px', color: '#555', fontSize: 14 }}>{doctor.specialty}</p>
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              <span
-                style={{
-                  background: `${tierColor[doctor.tier] || '#666'}20`,
-                  color: tierColor[doctor.tier] || '#666',
-                  fontSize: 12,
-                  fontWeight: 600,
-                  padding: '3px 10px',
-                  borderRadius: 12,
-                }}
-              >
+            <h2 className="mt-0 mb-1.5 text-[22px] font-semibold">{doctor.fullName}</h2>
+            <p className="mt-0 mb-2 text-gray-600 text-sm">{doctor.specialty}</p>
+            <div className="flex gap-2 flex-wrap">
+              <span className={`${tierClasses[doctor.tier] ?? 'bg-gray-100 text-gray-600'} text-xs font-semibold px-2.5 py-0.5 rounded-full`}>
                 {doctor.tier}
               </span>
-              <span style={{ fontSize: 13, color: '#666', alignSelf: 'center' }}>
+              <span className="text-[13px] text-gray-500 self-center">
                 {doctor.experience} years experience
               </span>
             </div>
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
+        <div className="grid grid-cols-2 gap-3 mb-4">
           {[
             { label: 'Consultation Fee', value: `₹${safeConsultationFee}` },
             { label: 'Rating', value: `${safeAverageRating.toFixed(1)} / 5 (${doctor.totalRatings} reviews)` },
           ].map((item) => (
-            <div key={item.label} style={{ background: '#f8f9fa', padding: 12, borderRadius: 6 }}>
-              <div style={{ fontSize: 11, color: '#666', marginBottom: 4, fontWeight: 600 }}>{item.label}</div>
-              <div style={{ fontWeight: 600, fontSize: 15 }}>{item.value}</div>
+            <div key={item.label} className="bg-gray-50 p-3 rounded-md">
+              <div className="text-[11px] text-gray-500 mb-1 font-semibold">{item.label}</div>
+              <div className="font-semibold text-[15px]">{item.value}</div>
             </div>
           ))}
         </div>
 
         {doctor.bio && (
-          <div style={{ marginBottom: 16 }}>
-            <h4 style={{ margin: '0 0 6px', fontSize: 14 }}>About</h4>
-            <p style={{ margin: 0, color: '#555', fontSize: 13, lineHeight: 1.6 }}>{doctor.bio}</p>
+          <div className="mb-4">
+            <h4 className="mt-0 mb-1.5 text-sm font-semibold">About</h4>
+            <p className="m-0 text-gray-600 text-[13px] leading-relaxed">{doctor.bio}</p>
           </div>
         )}
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+        <div className="flex items-center gap-2 mb-4">
           <RatingStars value={Math.round(safeAverageRating)} size={18} />
-          <span style={{ fontSize: 13, color: '#666' }}>{safeAverageRating.toFixed(1)} avg</span>
+          <span className="text-[13px] text-gray-500">{safeAverageRating.toFixed(1)} avg</span>
         </div>
 
         <button
           onClick={() => navigate(`/patient/book/${doctor.id}`)}
-          style={{
-            padding: '10px 24px',
-            background: '#1a73e8',
-            color: '#fff',
-            border: 'none',
-            borderRadius: 6,
-            cursor: 'pointer',
-            fontSize: 14,
-            fontWeight: 600,
-          }}
+          className="btn btn-primary px-6 py-2.5 text-sm font-semibold"
         >
           Book Consultation
         </button>
       </div>
 
       {ratings.length > 0 && (
-        <div
-          style={{
-            background: '#fff',
-            border: '1px solid #e0e0e0',
-            borderRadius: 10,
-            padding: 24,
-            boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-          }}
-        >
-          <h3 style={{ margin: '0 0 16px', fontSize: 16 }}>Patient Reviews</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div className="card">
+          <h3 className="mt-0 mb-4 text-base font-semibold">Patient Reviews</h3>
+          <div className="flex flex-col gap-3">
             {ratings.map((r) => (
-              <div key={r.id} style={{ borderBottom: '1px solid #f0f0f0', paddingBottom: 12 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+              <div key={r.id} className="border-b border-gray-100 pb-3">
+                <div className="flex items-center gap-2 mb-1">
                   <RatingStars value={r.score} size={14} />
-                  <span style={{ fontSize: 12, color: '#666' }}>
+                  <span className="text-xs text-gray-500">
                     by {r.patient?.username || 'Anonymous'} &bull; {new Date(r.createdAt).toLocaleDateString()}
                   </span>
                 </div>
-                {r.comment && <p style={{ margin: 0, fontSize: 13, color: '#555' }}>{r.comment}</p>}
+                {r.comment && <p className="m-0 text-[13px] text-gray-600">{r.comment}</p>}
               </div>
             ))}
           </div>
