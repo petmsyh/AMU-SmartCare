@@ -2,6 +2,24 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../../api/axios';
 import { DoctorProfile } from '../../types';
 
+function asNumber(value: unknown): number {
+  if (typeof value === 'number') return value;
+  if (typeof value === 'string') return Number(value);
+  if (value && typeof value === 'object' && 'toString' in value) {
+    const parsed = Number(value.toString());
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+  return 0;
+}
+
+function normalizeDoctor(doctor: DoctorProfile): DoctorProfile {
+  return {
+    ...doctor,
+    consultationFee: asNumber(doctor.consultationFee),
+    averageRating: asNumber(doctor.averageRating),
+  };
+}
+
 interface DoctorsState {
   list: DoctorProfile[];
   selected: DoctorProfile | null;
@@ -21,9 +39,9 @@ export const fetchDoctors = createAsyncThunk(
   async (params: { specialty?: string; name?: string } = {}, { rejectWithValue }) => {
     try {
       const res = await api.get('/doctors', { params });
-      return res.data;
+      return res.data.data;
     } catch (err: any) {
-      return rejectWithValue(err.response?.data?.message || 'Failed to fetch doctors');
+      return rejectWithValue(err.response?.data?.error || err.response?.data?.message || 'Failed to fetch doctors');
     }
   }
 );
@@ -33,21 +51,33 @@ export const fetchDoctorById = createAsyncThunk(
   async (id: string, { rejectWithValue }) => {
     try {
       const res = await api.get(`/doctors/${id}`);
-      return res.data;
+      return res.data.data;
     } catch (err: any) {
-      return rejectWithValue(err.response?.data?.message || 'Failed to fetch doctor');
+      return rejectWithValue(err.response?.data?.error || err.response?.data?.message || 'Failed to fetch doctor');
     }
   }
 );
 
 export const fetchMyDoctorProfile = createAsyncThunk(
   'doctors/fetchMyProfile',
-  async (_, { rejectWithValue }) => {
+  async (_, { rejectWithValue, getState }) => {
     try {
-      const res = await api.get('/doctors/me');
-      return res.data;
+      const state = getState() as { auth?: { user?: { id?: string } } };
+      const currentUserId = state.auth?.user?.id;
+
+      // Use list endpoint for compatibility with older backends where /doctors/profile or /doctors/me
+      // are interpreted as /doctors/:id and return 404.
+      const res = await api.get('/doctors', { params: { page: 1, limit: 200 } });
+      const doctors = res.data.data?.doctors ?? [];
+
+      if (!currentUserId) return null;
+      const myProfile = doctors.find((d: DoctorProfile & { user?: { id?: string } }) =>
+        d.userId === currentUserId || d.user?.id === currentUserId
+      );
+
+      return myProfile ?? null;
     } catch (err: any) {
-      return rejectWithValue(err.response?.data?.message || 'Failed to fetch profile');
+      return rejectWithValue(err.response?.data?.error || err.response?.data?.message || 'Failed to fetch profile');
     }
   }
 );
@@ -56,10 +86,18 @@ export const createDoctorProfile = createAsyncThunk(
   'doctors/createProfile',
   async (data: Partial<DoctorProfile>, { rejectWithValue }) => {
     try {
-      const res = await api.post('/doctors', data);
-      return res.data;
+      try {
+        const res = await api.post('/doctors/profile', data);
+        return res.data.data;
+      } catch (err: any) {
+        if (err.response?.status === 404) {
+          const fallback = await api.post('/doctors', data);
+          return fallback.data.data ?? fallback.data;
+        }
+        throw err;
+      }
     } catch (err: any) {
-      return rejectWithValue(err.response?.data?.message || 'Failed to create profile');
+      return rejectWithValue(err.response?.data?.error || err.response?.data?.message || 'Failed to create profile');
     }
   }
 );
@@ -68,10 +106,18 @@ export const updateDoctorProfile = createAsyncThunk(
   'doctors/updateProfile',
   async (data: Partial<DoctorProfile>, { rejectWithValue }) => {
     try {
-      const res = await api.put('/doctors/me', data);
-      return res.data;
+      try {
+        const res = await api.patch('/doctors/profile', data);
+        return res.data.data;
+      } catch (err: any) {
+        if (err.response?.status === 404) {
+          const fallback = await api.put('/doctors/me', data);
+          return fallback.data.data ?? fallback.data;
+        }
+        throw err;
+      }
     } catch (err: any) {
-      return rejectWithValue(err.response?.data?.message || 'Failed to update profile');
+      return rejectWithValue(err.response?.data?.error || err.response?.data?.message || 'Failed to update profile');
     }
   }
 );
@@ -92,7 +138,7 @@ const doctorsSlice = createSlice({
       })
       .addCase(fetchDoctors.fulfilled, (state, action) => {
         state.loading = false;
-        state.list = action.payload;
+        state.list = (action.payload?.doctors ?? []).map(normalizeDoctor);
       })
       .addCase(fetchDoctors.rejected, (state, action) => {
         state.loading = false;
@@ -104,7 +150,7 @@ const doctorsSlice = createSlice({
       })
       .addCase(fetchDoctorById.fulfilled, (state, action) => {
         state.loading = false;
-        state.selected = action.payload;
+        state.selected = action.payload ? normalizeDoctor(action.payload) : null;
       })
       .addCase(fetchDoctorById.rejected, (state, action) => {
         state.loading = false;
@@ -116,17 +162,17 @@ const doctorsSlice = createSlice({
       })
       .addCase(fetchMyDoctorProfile.fulfilled, (state, action) => {
         state.loading = false;
-        state.selected = action.payload;
+        state.selected = action.payload ? normalizeDoctor(action.payload) : null;
       })
       .addCase(fetchMyDoctorProfile.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       })
       .addCase(createDoctorProfile.fulfilled, (state, action) => {
-        state.selected = action.payload;
+        state.selected = action.payload ? normalizeDoctor(action.payload) : null;
       })
       .addCase(updateDoctorProfile.fulfilled, (state, action) => {
-        state.selected = action.payload;
+        state.selected = action.payload ? normalizeDoctor(action.payload) : null;
       });
   },
 });

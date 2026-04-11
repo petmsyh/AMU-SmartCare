@@ -10,6 +10,9 @@ const DoctorDashboard: React.FC = () => {
   const { user } = useSelector((state: RootState) => state.auth);
   const { list: consultations } = useSelector((state: RootState) => state.consultations);
   const { wallet } = useSelector((state: RootState) => state.payments);
+  const safeConsultations = Array.isArray(consultations) ? consultations : [];
+  const walletBalance = Number(wallet?.balance ?? 0);
+  const formattedWalletBalance = Number.isFinite(walletBalance) ? walletBalance.toFixed(2) : '0.00';
 
   useEffect(() => {
     dispatch(fetchMyConsultations());
@@ -17,11 +20,11 @@ const DoctorDashboard: React.FC = () => {
   }, [dispatch]);
 
   const stats = [
-    { label: 'Total Consultations', value: consultations.length, icon: '📋' },
-    { label: 'Pending', value: consultations.filter((c) => c.status === 'pending').length, icon: '⏳' },
-    { label: 'In Progress', value: consultations.filter((c) => c.status === 'in_progress').length, icon: '🔄' },
-    { label: 'Completed', value: consultations.filter((c) => c.status === 'completed').length, icon: '✅' },
-    { label: 'Wallet Balance', value: `₹${wallet?.balance?.toFixed(2) || '0.00'}`, icon: '💰' },
+    { label: 'Total Consultations', value: safeConsultations.length, icon: '📋' },
+    { label: 'Pending', value: safeConsultations.filter((c) => c.status === 'pending').length, icon: '⏳' },
+    { label: 'In Progress', value: safeConsultations.filter((c) => c.status === 'in_progress').length, icon: '🔄' },
+    { label: 'Completed', value: safeConsultations.filter((c) => c.status === 'completed').length, icon: '✅' },
+    { label: 'Wallet Balance', value: `₹${formattedWalletBalance}`, icon: '💰' },
   ];
 
   const quickLinks = [

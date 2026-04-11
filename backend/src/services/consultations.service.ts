@@ -4,11 +4,17 @@ import { prisma } from '../app';
 
 export const consultationsService = {
   async request(patientId: string, doctorId: string, scheduledAt?: Date, notes?: string) {
-    const doctor = await prisma.user.findUnique({ where: { id: doctorId } });
-    if (!doctor) throw Object.assign(new Error('Doctor not found'), { statusCode: 404 });
-    if (doctor.role !== Role.doctor) throw Object.assign(new Error('Target user is not a doctor'), { statusCode: 400 });
+    // Support both doctor userId and doctor profile id from frontend clients.
+    let resolvedDoctorUserId = doctorId;
 
-    return consultationRepository.create({ patientId, doctorId, scheduledAt, notes });
+    const doctorUser = await prisma.user.findUnique({ where: { id: doctorId } });
+    if (!doctorUser || doctorUser.role !== Role.doctor) {
+      const doctorProfile = await prisma.doctorProfile.findUnique({ where: { id: doctorId } });
+      if (!doctorProfile) throw Object.assign(new Error('Doctor not found'), { statusCode: 404 });
+      resolvedDoctorUserId = doctorProfile.userId;
+    }
+
+    return consultationRepository.create({ patientId, doctorId: resolvedDoctorUserId, scheduledAt, notes });
   },
 
   async getMyConsultations(userId: string, role: string, page?: number, limit?: number) {

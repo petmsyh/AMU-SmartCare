@@ -78,6 +78,10 @@ const MockPaymentDashboard: React.FC = () => {
     failed: { bg: '#fce8e6', color: '#c5221f' },
     refunded: { bg: '#f3e5f5', color: '#6a1b9a' },
   };
+  const formatAmount = (value: unknown) => {
+    const numericValue = Number(value ?? 0);
+    return Number.isFinite(numericValue) ? numericValue.toFixed(2) : '0.00';
+  };
 
   return (
     <div>
@@ -196,7 +200,7 @@ const MockPaymentDashboard: React.FC = () => {
                     )}
                   </div>
                   <div style={{ fontSize: 12, color: '#666' }}>
-                    User: {tx.userId} &bull; Amount: <strong>₹{tx.amount.toFixed(2)}</strong> &bull;{' '}
+                    User: {tx.userId} &bull; Amount: <strong>₹{formatAmount(tx.amount)}</strong> &bull;{' '}
                     {new Date(tx.createdAt).toLocaleString()}
                   </div>
                   {tx.description && (

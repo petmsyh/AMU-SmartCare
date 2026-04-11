@@ -29,6 +29,11 @@ const DoctorProfile: React.FC = () => {
   );
   if (!doctor) return null;
 
+  const consultationFee = Number(doctor.consultationFee ?? 0);
+  const averageRating = Number(doctor.averageRating ?? 0);
+  const safeConsultationFee = Number.isFinite(consultationFee) ? consultationFee : 0;
+  const safeAverageRating = Number.isFinite(averageRating) ? averageRating : 0;
+
   const tierColor: Record<string, string> = {
     GeneralPractitioner: '#34a853',
     Specialist: '#1a73e8',
@@ -95,8 +100,8 @@ const DoctorProfile: React.FC = () => {
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
           {[
-            { label: 'Consultation Fee', value: `₹${doctor.consultationFee}` },
-            { label: 'Rating', value: `${doctor.averageRating.toFixed(1)} / 5 (${doctor.totalRatings} reviews)` },
+            { label: 'Consultation Fee', value: `₹${safeConsultationFee}` },
+            { label: 'Rating', value: `${safeAverageRating.toFixed(1)} / 5 (${doctor.totalRatings} reviews)` },
           ].map((item) => (
             <div key={item.label} style={{ background: '#f8f9fa', padding: 12, borderRadius: 6 }}>
               <div style={{ fontSize: 11, color: '#666', marginBottom: 4, fontWeight: 600 }}>{item.label}</div>
@@ -113,8 +118,8 @@ const DoctorProfile: React.FC = () => {
         )}
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-          <RatingStars value={Math.round(doctor.averageRating)} size={18} />
-          <span style={{ fontSize: 13, color: '#666' }}>{doctor.averageRating.toFixed(1)} avg</span>
+          <RatingStars value={Math.round(safeAverageRating)} size={18} />
+          <span style={{ fontSize: 13, color: '#666' }}>{safeAverageRating.toFixed(1)} avg</span>
         </div>
 
         <button

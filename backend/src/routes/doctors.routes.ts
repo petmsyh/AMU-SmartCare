@@ -6,6 +6,7 @@ import { requireRole } from '../middlewares/rbac.middleware';
 const router = Router();
 
 router.get('/', doctorsController.getAll);
+router.get('/profile', authMiddleware, requireRole('doctor'), doctorsController.getMyProfile);
 router.get('/:id', doctorsController.getById);
 
 router.post('/profile', authMiddleware, requireRole('doctor'), doctorsController.createProfile);

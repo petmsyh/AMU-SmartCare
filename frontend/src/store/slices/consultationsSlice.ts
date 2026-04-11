@@ -23,9 +23,9 @@ export const fetchMyConsultations = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const res = await api.get('/consultations');
-      return res.data;
+      return res.data.data;
     } catch (err: any) {
-      return rejectWithValue(err.response?.data?.message || 'Failed to fetch consultations');
+      return rejectWithValue(err.response?.data?.error || err.response?.data?.message || 'Failed to fetch consultations');
     }
   }
 );
@@ -35,9 +35,9 @@ export const fetchConsultationById = createAsyncThunk(
   async (id: string, { rejectWithValue }) => {
     try {
       const res = await api.get(`/consultations/${id}`);
-      return res.data;
+      return res.data.data;
     } catch (err: any) {
-      return rejectWithValue(err.response?.data?.message || 'Failed to fetch consultation');
+      return rejectWithValue(err.response?.data?.error || err.response?.data?.message || 'Failed to fetch consultation');
     }
   }
 );
@@ -46,10 +46,18 @@ export const createConsultation = createAsyncThunk(
   'consultations/create',
   async (data: { doctorId: string; scheduledAt?: string; notes?: string }, { rejectWithValue }) => {
     try {
-      const res = await api.post('/consultations', data);
-      return res.data;
+      try {
+        const res = await api.post('/consultations/request', data);
+        return res.data.data;
+      } catch (err: any) {
+        if (err.response?.status === 404) {
+          const fallback = await api.post('/consultations', data);
+          return fallback.data.data;
+        }
+        throw err;
+      }
     } catch (err: any) {
-      return rejectWithValue(err.response?.data?.message || 'Failed to create consultation');
+      return rejectWithValue(err.response?.data?.error || err.response?.data?.message || 'Failed to create consultation');
     }
   }
 );
@@ -58,10 +66,11 @@ export const updateConsultationStatus = createAsyncThunk(
   'consultations/updateStatus',
   async ({ id, status }: { id: string; status: string }, { rejectWithValue }) => {
     try {
-      const res = await api.patch(`/consultations/${id}/status`, { status });
-      return res.data;
+      const normalized = status === 'accepted' ? 'accept' : status === 'declined' ? 'decline' : status;
+      const res = await api.patch(`/consultations/${id}/${normalized}`);
+      return res.data.data;
     } catch (err: any) {
-      return rejectWithValue(err.response?.data?.message || 'Failed to update status');
+      return rejectWithValue(err.response?.data?.error || err.response?.data?.message || 'Failed to update status');
     }
   }
 );
@@ -70,10 +79,10 @@ export const confirmConsultation = createAsyncThunk(
   'consultations/confirm',
   async (id: string, { rejectWithValue }) => {
     try {
-      const res = await api.post(`/consultations/${id}/confirm`);
-      return res.data;
+      const res = await api.patch(`/consultations/${id}/confirm`);
+      return res.data.data;
     } catch (err: any) {
-      return rejectWithValue(err.response?.data?.message || 'Failed to confirm consultation');
+      return rejectWithValue(err.response?.data?.error || err.response?.data?.message || 'Failed to confirm consultation');
     }
   }
 );
@@ -82,10 +91,10 @@ export const fetchMessages = createAsyncThunk(
   'consultations/fetchMessages',
   async (consultationId: string, { rejectWithValue }) => {
     try {
-      const res = await api.get(`/consultations/${consultationId}/messages`);
-      return res.data;
+      const res = await api.get(`/messages/consultation/${consultationId}`);
+      return res.data.data?.messages ?? [];
     } catch (err: any) {
-      return rejectWithValue(err.response?.data?.message || 'Failed to fetch messages');
+      return rejectWithValue(err.response?.data?.error || err.response?.data?.message || 'Failed to fetch messages');
     }
   }
 );
@@ -94,10 +103,10 @@ export const sendMessage = createAsyncThunk(
   'consultations/sendMessage',
   async ({ consultationId, content }: { consultationId: string; content: string }, { rejectWithValue }) => {
     try {
-      const res = await api.post(`/consultations/${consultationId}/messages`, { content });
-      return res.data;
+      const res = await api.post(`/messages/consultation/${consultationId}`, { content });
+      return res.data.data;
     } catch (err: any) {
-      return rejectWithValue(err.response?.data?.message || 'Failed to send message');
+      return rejectWithValue(err.response?.data?.error || err.response?.data?.message || 'Failed to send message');
     }
   }
 );
@@ -110,9 +119,9 @@ export const rateDoctor = createAsyncThunk(
   ) => {
     try {
       const res = await api.post('/ratings', { doctorId, consultationId, score, comment });
-      return res.data;
+      return res.data.data;
     } catch (err: any) {
-      return rejectWithValue(err.response?.data?.message || 'Failed to submit rating');
+      return rejectWithValue(err.response?.data?.error || err.response?.data?.message || 'Failed to submit rating');
     }
   }
 );
@@ -134,7 +143,7 @@ const consultationsSlice = createSlice({
       })
       .addCase(fetchMyConsultations.fulfilled, (state, action) => {
         state.loading = false;
-        state.list = action.payload;
+        state.list = action.payload?.consultations ?? [];
       })
       .addCase(fetchMyConsultations.rejected, (state, action) => {
         state.loading = false;
@@ -161,7 +170,7 @@ const consultationsSlice = createSlice({
         state.selected = action.payload;
       })
       .addCase(fetchMessages.fulfilled, (state, action) => {
-        state.messages = action.payload;
+        state.messages = action.payload ?? [];
       })
       .addCase(sendMessage.fulfilled, (state, action) => {
         state.messages.push(action.payload);

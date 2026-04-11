@@ -27,6 +27,21 @@ export const doctorsController = {
     }
   },
 
+  async getMyProfile(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const userId = req.user!.id;
+      const profile = await doctorsService.getByUserId(userId);
+      res.json({ success: true, data: profile });
+    } catch (err) {
+      const error = err as Error & { statusCode?: number };
+      if (error.statusCode === 404) {
+        res.json({ success: true, data: null });
+        return;
+      }
+      res.status(error.statusCode || 500).json({ success: false, error: error.message });
+    }
+  },
+
   async createProfile(req: AuthRequest, res: Response): Promise<void> {
     try {
       const userId = req.user!.id;

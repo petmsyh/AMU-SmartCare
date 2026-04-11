@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { PrismaClient, Role, DoctorTier } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
@@ -40,21 +41,21 @@ async function main() {
   // Doctor 1
   const doctor1Password = await bcrypt.hash('Doctor1234!', 12);
   const doctor1 = await prisma.user.upsert({
-    where: { email: 'dr.smith@amu.edu' },
+    where: { email: 'dr.kebede@amu.edu' },
     update: {},
     create: {
-      email: 'dr.smith@amu.edu',
-      username: 'dr_smith',
+      email: 'dr.kebede@amu.edu',
+      username: 'dr_kebede',
       passwordHash: doctor1Password,
       role: Role.doctor,
       isVerified: true,
       wallet: { create: { balance: 0 } },
       doctorProfile: {
         create: {
-          fullName: 'Dr. John Smith',
-          specialty: 'Cardiology',
+          fullName: 'Dr. Kebede Tesfaye',
+          specialty: 'Internal Medicine',
           experience: 10,
-          bio: 'Experienced cardiologist with 10 years of practice.',
+          bio: 'Experienced internal medicine specialist with a broad clinical background.',
           consultationFee: 150,
           tier: DoctorTier.Specialist,
           certifications: ['MBBS', 'MD Cardiology'],
@@ -72,24 +73,24 @@ async function main() {
   // Doctor 2
   const doctor2Password = await bcrypt.hash('Doctor1234!', 12);
   const doctor2 = await prisma.user.upsert({
-    where: { email: 'dr.jones@amu.edu' },
+    where: { email: 'dr.tigist@amu.edu' },
     update: {},
     create: {
-      email: 'dr.jones@amu.edu',
-      username: 'dr_jones',
+      email: 'dr.tigist@amu.edu',
+      username: 'dr_tigist',
       passwordHash: doctor2Password,
       role: Role.doctor,
       isVerified: true,
       wallet: { create: { balance: 0 } },
       doctorProfile: {
         create: {
-          fullName: 'Dr. Sarah Jones',
-          specialty: 'Dermatology',
+          fullName: 'Dr. Tigist Alemu',
+          specialty: 'Pediatrics',
           experience: 7,
-          bio: 'Specialist in skin disorders and cosmetic dermatology.',
+          bio: 'Pediatrics specialist focused on child and adolescent care.',
           consultationFee: 120,
           tier: DoctorTier.Specialist,
-          certifications: ['MBBS', 'MD Dermatology'],
+          certifications: ['MBBS', 'MD Pediatrics'],
           availabilitySchedule: {
             monday: ['10:00-13:00'],
             thursday: ['09:00-12:00', '15:00-18:00'],
@@ -104,24 +105,24 @@ async function main() {
   // Doctor 3
   const doctor3Password = await bcrypt.hash('Doctor1234!', 12);
   const doctor3 = await prisma.user.upsert({
-    where: { email: 'dr.patel@amu.edu' },
+    where: { email: 'dr.yonas@amu.edu' },
     update: {},
     create: {
-      email: 'dr.patel@amu.edu',
-      username: 'dr_patel',
+      email: 'dr.yonas@amu.edu',
+      username: 'dr_yonas',
       passwordHash: doctor3Password,
       role: Role.doctor,
       isVerified: true,
       wallet: { create: { balance: 0 } },
       doctorProfile: {
         create: {
-          fullName: 'Dr. Raj Patel',
-          specialty: 'General Medicine',
+          fullName: 'Dr. Yonas Bekele',
+          specialty: 'Surgery',
           experience: 15,
-          bio: 'General practitioner with broad clinical experience.',
+          bio: 'Surgical specialist with extensive clinical and operative experience.',
           consultationFee: 80,
-          tier: DoctorTier.GeneralPractitioner,
-          certifications: ['MBBS'],
+          tier: DoctorTier.SuperSpecialist,
+          certifications: ['MBBS', 'MS Surgery'],
           availabilitySchedule: {
             monday: ['08:00-12:00', '14:00-18:00'],
             tuesday: ['08:00-12:00', '14:00-18:00'],

@@ -10,6 +10,12 @@ const DoctorWallet: React.FC = () => {
   const [withdrawError, setWithdrawError] = useState('');
   const [withdrawSuccess, setWithdrawSuccess] = useState('');
   const [withdrawing, setWithdrawing] = useState(false);
+  const balanceValue = Number(wallet?.balance ?? 0);
+  const formattedBalance = Number.isFinite(balanceValue) ? balanceValue.toFixed(2) : '0.00';
+  const formatAmount = (value: unknown) => {
+    const numericValue = Number(value ?? 0);
+    return Number.isFinite(numericValue) ? numericValue.toFixed(2) : '0.00';
+  };
 
   useEffect(() => {
     dispatch(fetchWallet());
@@ -25,7 +31,7 @@ const DoctorWallet: React.FC = () => {
       setWithdrawError('Enter a valid amount');
       return;
     }
-    if (wallet && amount > wallet.balance) {
+    if (wallet && amount > Number(wallet.balance ?? 0)) {
       setWithdrawError('Insufficient balance');
       return;
     }
@@ -66,7 +72,7 @@ const DoctorWallet: React.FC = () => {
       >
         <div style={{ fontSize: 13, opacity: 0.8, marginBottom: 4 }}>Available Balance</div>
         <div style={{ fontSize: 36, fontWeight: 700 }}>
-          {loading ? '…' : `₹${wallet?.balance?.toFixed(2) || '0.00'}`}
+          {loading ? '…' : `₹${formattedBalance}`}
         </div>
       </div>
 
@@ -174,7 +180,7 @@ const DoctorWallet: React.FC = () => {
                     color: ['payment', 'escrow_release'].includes(tx.type) ? '#34a853' : '#ea4335',
                   }}
                 >
-                  {['payment', 'escrow_release'].includes(tx.type) ? '+' : '-'}₹{tx.amount.toFixed(2)}
+                  {['payment', 'escrow_release'].includes(tx.type) ? '+' : '-'}₹{formatAmount(tx.amount)}
                 </div>
                 <div style={{ fontSize: 11, color: '#888' }}>{tx.status}</div>
               </div>

@@ -53,6 +53,8 @@ const BookConsultation: React.FC = () => {
   };
 
   if (!doctor) return <p style={{ color: '#666' }}>Loading doctor info…</p>;
+  const fee = Number(doctor.consultationFee ?? 0);
+  const safeFee = Number.isFinite(fee) ? fee : 0;
 
   return (
     <div style={{ maxWidth: 520 }}>
@@ -86,7 +88,7 @@ const BookConsultation: React.FC = () => {
             color: '#1a73e8',
           }}
         >
-          Consultation Fee: <strong>₹{doctor.consultationFee}</strong>
+          Consultation Fee: <strong>₹{safeFee}</strong>
         </div>
 
         <form onSubmit={handleBook}>
@@ -150,7 +152,7 @@ const BookConsultation: React.FC = () => {
       {showPayment && createdConsultationId && (
         <MockPaymentModal
           consultationId={createdConsultationId}
-          amount={doctor.consultationFee}
+          amount={safeFee}
           onClose={() => setShowPayment(false)}
           onSuccess={handlePaymentSuccess}
         />

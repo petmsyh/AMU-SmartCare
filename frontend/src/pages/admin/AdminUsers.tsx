@@ -13,9 +13,9 @@ const AdminUsers: React.FC = () => {
     setError('');
     try {
       const res = await api.get('/admin/users');
-      setUsers(res.data);
+      setUsers(res.data.data?.users ?? []);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to load users');
+      setError(err.response?.data?.error || err.response?.data?.message || 'Failed to load users');
     }
     setLoading(false);
   };
@@ -26,22 +26,22 @@ const AdminUsers: React.FC = () => {
 
   const handleVerify = async (userId: string) => {
     try {
-      await api.post(`/admin/users/${userId}/verify`);
+      await api.patch(`/admin/users/${userId}/verify`, { isVerified: true });
       setActionMsg('User verified');
       loadUsers();
     } catch (err: any) {
-      setActionMsg(err.response?.data?.message || 'Action failed');
+      setActionMsg(err.response?.data?.error || err.response?.data?.message || 'Action failed');
     }
     setTimeout(() => setActionMsg(''), 3000);
   };
 
   const handleToggleActive = async (userId: string, isActive: boolean) => {
     try {
-      await api.patch(`/admin/users/${userId}`, { isActive: !isActive });
+      await api.patch(`/admin/users/${userId}/disable`, { isActive: !isActive });
       setActionMsg(`User ${isActive ? 'disabled' : 'enabled'}`);
       loadUsers();
     } catch (err: any) {
-      setActionMsg(err.response?.data?.message || 'Action failed');
+      setActionMsg(err.response?.data?.error || err.response?.data?.message || 'Action failed');
     }
     setTimeout(() => setActionMsg(''), 3000);
   };
@@ -52,6 +52,7 @@ const AdminUsers: React.FC = () => {
     student: '#9c27b0',
     admin: '#c62828',
   };
+  const safeUsers = Array.isArray(users) ? users : [];
 
   return (
     <div>
@@ -109,7 +110,7 @@ const AdminUsers: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {users.map((u) => (
+            {safeUsers.map((u) => (
               <tr key={u.id} style={{ borderBottom: '1px solid #f0f0f0' }}>
                 <td style={{ padding: '10px 14px', fontWeight: 600 }}>{u.username}</td>
                 <td style={{ padding: '10px 14px', color: '#555' }}>{u.email}</td>
@@ -180,7 +181,7 @@ const AdminUsers: React.FC = () => {
             ))}
           </tbody>
         </table>
-        {!loading && users.length === 0 && (
+        {!loading && safeUsers.length === 0 && (
           <p style={{ padding: 20, color: '#666', textAlign: 'center' }}>No users found.</p>
         )}
       </div>
