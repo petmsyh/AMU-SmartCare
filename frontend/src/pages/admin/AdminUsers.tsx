@@ -2,6 +2,13 @@ import React, { useEffect, useState } from 'react';
 import api from '../../api/axios';
 import { User } from '../../types';
 
+const roleClass: Record<string, string> = {
+  patient: 'bg-success-100 text-success-700',
+  doctor: 'bg-primary-50 text-primary-600',
+  student: 'bg-purple-100 text-purple-700',
+  admin: 'bg-danger-100 text-danger-700',
+};
+
 const AdminUsers: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
@@ -15,7 +22,11 @@ const AdminUsers: React.FC = () => {
       const res = await api.get('/admin/users');
       setUsers(res.data.data?.users ?? []);
     } catch (err: any) {
-      setError(err.response?.data?.error || err.response?.data?.message || 'Failed to load users');
+      setError(
+        err.response?.data?.error ||
+          err.response?.data?.message ||
+          'Failed to load users',
+      );
     }
     setLoading(false);
   };
@@ -30,7 +41,11 @@ const AdminUsers: React.FC = () => {
       setActionMsg('User verified');
       loadUsers();
     } catch (err: any) {
-      setActionMsg(err.response?.data?.error || err.response?.data?.message || 'Action failed');
+      setActionMsg(
+        err.response?.data?.error ||
+          err.response?.data?.message ||
+          'Action failed',
+      );
     }
     setTimeout(() => setActionMsg(''), 3000);
   };
@@ -41,68 +56,50 @@ const AdminUsers: React.FC = () => {
       setActionMsg(`User ${isActive ? 'disabled' : 'enabled'}`);
       loadUsers();
     } catch (err: any) {
-      setActionMsg(err.response?.data?.error || err.response?.data?.message || 'Action failed');
+      setActionMsg(
+        err.response?.data?.error ||
+          err.response?.data?.message ||
+          'Action failed',
+      );
     }
     setTimeout(() => setActionMsg(''), 3000);
   };
 
-  const roleColors: Record<string, string> = {
-    patient: '#34a853',
-    doctor: '#1a73e8',
-    student: '#9c27b0',
-    admin: '#c62828',
-  };
   const safeUsers = Array.isArray(users) ? users : [];
 
   return (
     <div>
-      <h2 style={{ margin: '0 0 20px', fontSize: 22 }}>User Management</h2>
+      <h2 className="mb-5 text-2xl font-bold text-gray-800">User Management</h2>
 
       {actionMsg && (
-        <div
-          style={{
-            background: '#e8f5e9',
-            color: '#2e7d32',
-            padding: '8px 14px',
-            borderRadius: 6,
-            marginBottom: 14,
-            fontSize: 13,
-          }}
-        >
+        <div className="mb-3.5 rounded-lg bg-success-100 px-4 py-2 text-sm text-success-700">
           ✅ {actionMsg}
         </div>
       )}
 
-      {loading && <p style={{ color: '#666' }}>Loading users…</p>}
+      {loading && <p className="text-gray-500">Loading users…</p>}
       {error && (
-        <div style={{ background: '#fce8e6', color: '#c5221f', padding: '10px 14px', borderRadius: 6 }}>
+        <div className="mb-4 rounded-lg bg-danger-100 px-4 py-3 text-danger-700">
           {error}
         </div>
       )}
 
-      <div
-        style={{
-          background: '#fff',
-          border: '1px solid #e0e0e0',
-          borderRadius: 10,
-          overflow: 'hidden',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-        }}
-      >
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+      <div className="card overflow-hidden">
+        <table className="w-full border-collapse text-sm">
           <thead>
-            <tr style={{ background: '#f8f9fa', borderBottom: '2px solid #e0e0e0' }}>
-              {['Username', 'Email', 'Role', 'Verified', 'Active', 'Joined', 'Actions'].map((h) => (
+            <tr className="border-b-2 border-gray-200 bg-gray-50">
+              {[
+                'Username',
+                'Email',
+                'Role',
+                'Verified',
+                'Active',
+                'Joined',
+                'Actions',
+              ].map((h) => (
                 <th
                   key={h}
-                  style={{
-                    padding: '12px 14px',
-                    textAlign: 'left',
-                    fontWeight: 600,
-                    color: '#555',
-                    fontSize: 12,
-                    whiteSpace: 'nowrap',
-                  }}
+                  className="whitespace-nowrap px-3.5 py-3 text-left text-xs font-semibold text-gray-500"
                 >
                   {h}
                 </th>
@@ -111,67 +108,48 @@ const AdminUsers: React.FC = () => {
           </thead>
           <tbody>
             {safeUsers.map((u) => (
-              <tr key={u.id} style={{ borderBottom: '1px solid #f0f0f0' }}>
-                <td style={{ padding: '10px 14px', fontWeight: 600 }}>{u.username}</td>
-                <td style={{ padding: '10px 14px', color: '#555' }}>{u.email}</td>
-                <td style={{ padding: '10px 14px' }}>
+              <tr key={u.id} className="border-b border-gray-100">
+                <td className="px-3.5 py-2.5 font-semibold text-gray-800">
+                  {u.username}
+                </td>
+                <td className="px-3.5 py-2.5 text-gray-500">{u.email}</td>
+                <td className="px-3.5 py-2.5">
                   <span
-                    style={{
-                      background: `${roleColors[u.role] || '#666'}20`,
-                      color: roleColors[u.role] || '#666',
-                      padding: '2px 8px',
-                      borderRadius: 10,
-                      fontSize: 11,
-                      fontWeight: 600,
-                    }}
+                    className={`badge ${roleClass[u.role] ?? 'bg-gray-100 text-gray-600'}`}
                   >
                     {u.role}
                   </span>
                 </td>
-                <td style={{ padding: '10px 14px' }}>
-                  <span style={{ color: u.isVerified ? '#34a853' : '#e65100', fontWeight: 600, fontSize: 12 }}>
+                <td className="px-3.5 py-2.5">
+                  <span
+                    className={`text-xs font-semibold ${u.isVerified ? 'text-success-500' : 'text-orange-600'}`}
+                  >
                     {u.isVerified ? '✅ Yes' : '⏳ No'}
                   </span>
                 </td>
-                <td style={{ padding: '10px 14px' }}>
-                  <span style={{ color: u.isActive ? '#34a853' : '#ea4335', fontWeight: 600, fontSize: 12 }}>
+                <td className="px-3.5 py-2.5">
+                  <span
+                    className={`text-xs font-semibold ${u.isActive ? 'text-success-500' : 'text-danger-500'}`}
+                  >
                     {u.isActive ? '✅ Yes' : '❌ No'}
                   </span>
                 </td>
-                <td style={{ padding: '10px 14px', color: '#666', whiteSpace: 'nowrap' }}>
+                <td className="whitespace-nowrap px-3.5 py-2.5 text-gray-500">
                   {new Date(u.createdAt).toLocaleDateString()}
                 </td>
-                <td style={{ padding: '10px 14px' }}>
-                  <div style={{ display: 'flex', gap: 6 }}>
+                <td className="px-3.5 py-2.5">
+                  <div className="flex gap-1.5">
                     {!u.isVerified && (
                       <button
                         onClick={() => handleVerify(u.id)}
-                        style={{
-                          padding: '4px 10px',
-                          background: '#34a853',
-                          color: '#fff',
-                          border: 'none',
-                          borderRadius: 4,
-                          cursor: 'pointer',
-                          fontSize: 11,
-                          fontWeight: 600,
-                        }}
+                        className="btn-sm rounded-md bg-success-500 px-2.5 py-1 text-xs font-semibold text-white hover:bg-success-700"
                       >
                         Verify
                       </button>
                     )}
                     <button
                       onClick={() => handleToggleActive(u.id, u.isActive)}
-                      style={{
-                        padding: '4px 10px',
-                        background: u.isActive ? '#ea4335' : '#34a853',
-                        color: '#fff',
-                        border: 'none',
-                        borderRadius: 4,
-                        cursor: 'pointer',
-                        fontSize: 11,
-                        fontWeight: 600,
-                      }}
+                      className={`btn-sm rounded-md px-2.5 py-1 text-xs font-semibold text-white ${u.isActive ? 'bg-danger-500 hover:bg-danger-700' : 'bg-success-500 hover:bg-success-700'}`}
                     >
                       {u.isActive ? 'Disable' : 'Enable'}
                     </button>
@@ -182,7 +160,7 @@ const AdminUsers: React.FC = () => {
           </tbody>
         </table>
         {!loading && safeUsers.length === 0 && (
-          <p style={{ padding: 20, color: '#666', textAlign: 'center' }}>No users found.</p>
+          <p className="p-5 text-center text-gray-500">No users found.</p>
         )}
       </div>
     </div>
