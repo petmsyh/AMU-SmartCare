@@ -6,6 +6,7 @@ import { fetchMe } from './store/slices/authSlice';
 
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
+import LandingPage from './pages/LandingPage';
 
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -42,7 +43,7 @@ const App: React.FC = () => {
   }, [token, user, dispatch]);
 
   const defaultRoute = () => {
-    if (!token) return <Navigate to="/login" replace />;
+    if (!token) return <LandingPage />;
     if (!user) return <div style={{ padding: 20, color: '#666' }}>Loading…</div>;
     const routes: Record<string, string> = {
       patient: '/patient',
