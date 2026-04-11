@@ -1,0 +1,170 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  username     String   @unique
+  passwordHash String
+  role         Role     @default(patient)
+  isVerified   Boolean  @default(false)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  doctorProfile        DoctorProfile?
+  patientRatings       Rating[]       @relation("PatientRatings")
+  doctorRatings        Rating[]       @relation("DoctorRatings")
+  patientConsultations Consultation[] @relation("PatientConsultations")
+  doctorConsultations  Consultation[] @relation("DoctorConsultations")
+  sentMessages         Message[]      @relation("SentMessages")
+  wallet               Wallet?
+  transactions         Transaction[]
+}
+
+enum Role {
+  patient
+  doctor
+  student
+  admin
+}
+
+model DoctorProfile {
+  id                   String     @id @default(uuid())
+  userId               String     @unique
+  user                 User       @relation(fields: [userId], references: [id])
+  fullName             String
+  specialty            String
+  experience           Int        @default(0)
+  bio                  String?
+  contactInfo          String?
+  profilePictureUrl    String?
+  certifications       Json?
+  consultationFee      Decimal    @default(0)
+  tier                 DoctorTier @default(GeneralPractitioner)
+  availabilitySchedule Json?
+  averageRating        Decimal    @default(0)
+  totalRatings         Int        @default(0)
+  createdAt            DateTime   @default(now())
+  updatedAt            DateTime   @updatedAt
+}
+
+enum DoctorTier {
+  GeneralPractitioner
+  Specialist
+  SuperSpecialist
+}
+
+model Consultation {
+  id               String             @id @default(uuid())
+  patientId        String
+  patient          User               @relation("PatientConsultations", fields: [patientId], references: [id])
+  doctorId         String
+  doctor           User               @relation("DoctorConsultations", fields: [doctorId], references: [id])
+  status           ConsultationStatus @default(pending)
+  scheduledAt      DateTime?
+  notes            String?
+  patientConfirmed Boolean            @default(false)
+  doctorConfirmed  Boolean            @default(false)
+  autoReleaseAt    DateTime?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  messages     Message[]
+  ratings      Rating[]
+  transactions Transaction[]
+}
+
+enum ConsultationStatus {
+  pending
+  accepted
+  declined
+  in_progress
+  completed
+  cancelled
+  disputed
+}
+
+model Message {
+  id             String       @id @default(uuid())
+  consultationId String
+  consultation   Consultation @relation(fields: [consultationId], references: [id])
+  senderId       String
+  sender         User         @relation("SentMessages", fields: [senderId], references: [id])
+  content        String
+  createdAt      DateTime     @default(now())
+}
+
+model Rating {
+  id             String        @id @default(uuid())
+  patientId      String
+  patient        User          @relation("PatientRatings", fields: [patientId], references: [id])
+  doctorId       String
+  doctor         User          @relation("DoctorRatings", fields: [doctorId], references: [id])
+  consultationId String?
+  consultation   Consultation? @relation(fields: [consultationId], references: [id])
+  score          Int
+  comment        String?
+  isHidden       Boolean       @default(false)
+  createdAt      DateTime      @default(now())
+}
+
+model Wallet {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id])
+  balance   Decimal  @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Transaction {
+  id              String            @id @default(uuid())
+  userId          String
+  user            User              @relation(fields: [userId], references: [id])
+  consultationId  String?
+  consultation    Consultation?     @relation(fields: [consultationId], references: [id])
+  amount          Decimal
+  type            TransactionType
+  status          TransactionStatus @default(pending)
+  transactionMode TransactionMode   @default(mock)
+  mockOutcome     String?
+  isRealMoney     Boolean           @default(false)
+  escrowState     EscrowState?
+  description     String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+}
+
+enum TransactionType {
+  payment
+  escrow_hold
+  escrow_release
+  refund
+  withdrawal
+  commission
+}
+
+enum TransactionStatus {
+  pending
+  completed
+  failed
+  refunded
+}
+
+enum TransactionMode {
+  mock
+  live
+}
+
+enum EscrowState {
+  held
+  released
+  refunded
+}
