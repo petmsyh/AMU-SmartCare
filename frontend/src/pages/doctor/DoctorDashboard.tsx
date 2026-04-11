@@ -145,7 +145,7 @@ const DoctorDashboard: React.FC = () => {
             </div>
             <div style={{ fontWeight: 700, fontSize: 15, color: '#1a1a2e', marginBottom: 4 }}>{link.label}</div>
             <div style={{ fontSize: 12, color: '#777', marginBottom: 12 }}>{link.desc}</div>
-            <div style={{ fontSize: 13, color: link.color, fontWeight: 600 }}>Go →</div>
+            <div style={{ fontSize: 13, color: link.color, fontWeight: 600 }}>Go → </div>
           </Link>
         ))}
       </div>

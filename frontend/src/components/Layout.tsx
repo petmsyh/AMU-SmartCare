@@ -44,6 +44,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  // sidebarOpen is reserved for future mobile sidebar toggle implementation
 
   const getLinksByRole = () => {
     switch (user?.role) {
