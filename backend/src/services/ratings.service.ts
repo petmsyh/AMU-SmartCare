@@ -21,10 +21,13 @@ export const ratingsService = {
 
     const rating = await ratingRepository.create({ patientId, doctorId, consultationId, score, comment });
 
-    // Update doctor average rating
-    const allRatings = await prisma.rating.findMany({ where: { doctorId, isHidden: false } });
-    const avg = allRatings.length > 0 ? allRatings.reduce((sum, r) => sum + r.score, 0) / allRatings.length : 0;
-    await doctorRepository.update(doctorId, { averageRating: avg, totalRatings: allRatings.length });
+    // Update doctor average rating using DB aggregation
+    const [aggregate, totalCount] = await Promise.all([
+      prisma.rating.aggregate({ where: { doctorId, isHidden: false }, _avg: { score: true } }),
+      prisma.rating.count({ where: { doctorId, isHidden: false } }),
+    ]);
+    const avg = aggregate._avg.score ?? 0;
+    await doctorRepository.update(doctorId, { averageRating: avg, totalRatings: totalCount });
 
     return rating;
   },

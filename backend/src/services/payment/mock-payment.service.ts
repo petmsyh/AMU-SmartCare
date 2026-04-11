@@ -12,6 +12,7 @@ const COMMISSION_RATE = (() => {
   return 0.10;
 })();
 const AUTO_RELEASE_HOURS = parseInt(process.env.AUTO_RELEASE_HOURS || '24', 10);
+const HOURS_TO_MS = 60 * 60 * 1000;
 
 export class MockPaymentService implements IPaymentService {
   async initiatePayment(consultationId: string, patientId: string, amount: number): Promise<PaymentResult> {
@@ -73,7 +74,7 @@ export class MockPaymentService implements IPaymentService {
 
     await walletRepository.decrementBalance(transaction.userId, amount);
 
-    const autoReleaseAt = new Date(Date.now() + AUTO_RELEASE_HOURS * 60 * 60 * 1000);
+    const autoReleaseAt = new Date(Date.now() + AUTO_RELEASE_HOURS * HOURS_TO_MS);
 
     await transactionRepository.update(transactionId, {
       status: TransactionStatus.completed,

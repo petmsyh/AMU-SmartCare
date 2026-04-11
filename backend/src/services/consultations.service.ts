@@ -1,12 +1,12 @@
 import { consultationRepository } from '../repositories/consultation.repository';
-import { ConsultationStatus } from '@prisma/client';
+import { ConsultationStatus, Role } from '@prisma/client';
 import { prisma } from '../app';
 
 export const consultationsService = {
   async request(patientId: string, doctorId: string, scheduledAt?: Date, notes?: string) {
     const doctor = await prisma.user.findUnique({ where: { id: doctorId } });
     if (!doctor) throw Object.assign(new Error('Doctor not found'), { statusCode: 404 });
-    if (doctor.role !== 'doctor') throw Object.assign(new Error('Target user is not a doctor'), { statusCode: 400 });
+    if (doctor.role !== Role.doctor) throw Object.assign(new Error('Target user is not a doctor'), { statusCode: 400 });
 
     return consultationRepository.create({ patientId, doctorId, scheduledAt, notes });
   },
