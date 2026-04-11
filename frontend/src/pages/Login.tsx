@@ -26,95 +26,54 @@ const Login: React.FC = () => {
     }
   };
 
-  const containerStyle: React.CSSProperties = {
-    minHeight: '100vh',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    background: 'linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%)',
-  };
-
-  const cardStyle: React.CSSProperties = {
-    background: '#fff',
-    borderRadius: 12,
-    padding: 40,
-    width: 380,
-    boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
-  };
-
-  const inputStyle: React.CSSProperties = {
-    width: '100%',
-    padding: '10px 12px',
-    border: '1px solid #ddd',
-    borderRadius: 6,
-    fontSize: 14,
-    marginBottom: 14,
-  };
-
-  const btnStyle: React.CSSProperties = {
-    width: '100%',
-    padding: '12px',
-    background: '#1a73e8',
-    color: '#fff',
-    border: 'none',
-    borderRadius: 6,
-    fontSize: 15,
-    fontWeight: 600,
-    cursor: loading ? 'not-allowed' : 'pointer',
-    opacity: loading ? 0.7 : 1,
-  };
-
   return (
-    <div style={containerStyle}>
-      <div style={cardStyle}>
-        <h1 style={{ textAlign: 'center', margin: '0 0 6px', fontSize: 26 }}>AMU SmartCare</h1>
-        <p style={{ textAlign: 'center', color: '#666', margin: '0 0 28px', fontSize: 14 }}>
-          Patient-Doctor Connection Platform
-        </p>
-        <form onSubmit={handleSubmit}>
-          <label style={{ fontSize: 13, fontWeight: 600, display: 'block', marginBottom: 4 }}>
-            Email
-          </label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            placeholder="you@example.com"
-            style={inputStyle}
-          />
-          <label style={{ fontSize: 13, fontWeight: 600, display: 'block', marginBottom: 4 }}>
-            Password
-          </label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            placeholder="••••••••"
-            style={inputStyle}
-          />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-500 to-primary-900 p-4">
+      <div className="bg-white rounded-3xl p-10 w-full max-w-sm shadow-auth">
+        {/* Logo */}
+        <div className="flex justify-center mb-6">
+          <img src="/amu-logo.svg" alt="AMU Logo" className="w-14 h-14" />
+        </div>
+        <h1 className="text-center text-2xl font-extrabold text-gray-900 mb-1">AMU SmartCare</h1>
+        <p className="text-center text-sm text-gray-400 mb-8">Patient-Doctor Connection Platform</p>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="form-label">Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              placeholder="you@example.com"
+              className="form-input"
+            />
+          </div>
+          <div>
+            <label className="form-label">Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              placeholder="••••••••"
+              className="form-input"
+            />
+          </div>
+
           {error && (
-            <div
-              style={{
-                background: '#fce8e6',
-                color: '#c5221f',
-                padding: '8px 12px',
-                borderRadius: 4,
-                marginBottom: 14,
-                fontSize: 13,
-              }}
-            >
+            <div className="bg-danger-100 text-danger-700 px-4 py-2.5 rounded-xl text-sm">
               {error}
             </div>
           )}
-          <button type="submit" disabled={loading} style={btnStyle}>
+
+          <button type="submit" disabled={loading} className="btn-primary btn-lg w-full mt-2">
             {loading ? 'Signing in…' : 'Sign In'}
           </button>
         </form>
-        <p style={{ textAlign: 'center', marginTop: 20, fontSize: 13, color: '#666' }}>
-          Don't have an account?{' '}
-          <Link to="/register" style={{ color: '#1a73e8', fontWeight: 600 }}>
+
+        <p className="text-center mt-6 text-sm text-gray-500">
+          Don&apos;t have an account?{' '}
+          <Link to="/register" className="text-primary-500 font-semibold hover:underline">
             Register
           </Link>
         </p>

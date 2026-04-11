@@ -3,42 +3,12 @@ import { Link } from 'react-router-dom';
 
 const LandingPage: React.FC = () => {
   const features = [
-    {
-      icon: '🔍',
-      title: 'Find Specialists',
-      desc: 'Browse verified doctors and specialists across all medical departments',
-      color: '#1a73e8',
-    },
-    {
-      icon: '📋',
-      title: 'Book Consultations',
-      desc: 'Schedule appointments and manage your healthcare journey easily',
-      color: '#34a853',
-    },
-    {
-      icon: '🤖',
-      title: 'AI Health Assistant',
-      desc: 'Get instant AI-powered health guidance and symptom analysis',
-      color: '#9c27b0',
-    },
-    {
-      icon: '🎓',
-      title: 'Student Resources',
-      desc: 'Academic health assistant dedicated to medical students',
-      color: '#f4b400',
-    },
-    {
-      icon: '💳',
-      title: 'Secure Payments',
-      desc: 'Safe and transparent payment system with escrow protection',
-      color: '#ea4335',
-    },
-    {
-      icon: '🛡️',
-      title: 'Admin Control',
-      desc: 'Comprehensive platform management and user oversight tools',
-      color: '#0d47a1',
-    },
+    { icon: '🔍', title: 'Find Specialists', desc: 'Browse verified doctors across all departments', color: 'text-primary-500', bg: 'bg-primary-50' },
+    { icon: '📋', title: 'Book Consultations', desc: 'Schedule appointments and manage your journey', color: 'text-success-500', bg: 'bg-success-100' },
+    { icon: '🤖', title: 'AI Health Assistant', desc: 'Get instant AI-powered guidance and analysis', color: 'text-purple-500', bg: 'bg-purple-100' },
+    { icon: '🎓', title: 'Student Resources', desc: 'Academic health assistant for medical students', color: 'text-accent-400', bg: 'bg-accent-50' },
+    { icon: '💳', title: 'Secure Payments', desc: 'Safe payment system with escrow protection', color: 'text-danger-500', bg: 'bg-danger-100' },
+    { icon: '🛡️', title: 'Admin Control', desc: 'Comprehensive platform management tools', color: 'text-primary-900', bg: 'bg-primary-50' },
   ];
 
   const stats = [
@@ -49,409 +19,173 @@ const LandingPage: React.FC = () => {
   ];
 
   const steps = [
-    {
-      num: '1',
-      title: 'Create Account',
-      desc: 'Register as a patient, doctor, or student in minutes',
-      icon: '✍️',
-    },
-    {
-      num: '2',
-      title: 'Find Your Care',
-      desc: 'Search and connect with the right healthcare professional',
-      icon: '🔍',
-    },
-    {
-      num: '3',
-      title: 'Get Help',
-      desc: 'Receive quality consultations and AI-assisted guidance',
-      icon: '💊',
-    },
+    { num: '1', title: 'Create Account', desc: 'Register as patient, doctor, or student in minutes', icon: '✍️' },
+    { num: '2', title: 'Find Your Care', desc: 'Search and connect with the right healthcare professional', icon: '🔍' },
+    { num: '3', title: 'Get Help', desc: 'Receive quality consultations and AI-assisted guidance', icon: '💊' },
   ];
 
   return (
-    <div style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", color: '#1a1a2e', overflowX: 'hidden' }}>
-      {/* NAVIGATION */}
-      <header
-        style={{
-          position: 'sticky',
-          top: 0,
-          zIndex: 1000,
-          background: 'rgba(255,255,255,0.95)',
-          backdropFilter: 'blur(10px)',
-          borderBottom: '1px solid #e0e0e0',
-          padding: '0 32px',
-          height: 70,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <img src="/amu-logo.svg" alt="AMU Logo" style={{ width: 44, height: 44 }} />
-          <div>
-            <div style={{ fontWeight: 800, fontSize: 18, color: '#0d47a1', lineHeight: 1.2 }}>AMU SmartCare</div>
-            <div style={{ fontSize: 10, color: '#666', letterSpacing: 0.5 }}>Arba Minch University</div>
+    <div className="font-sans text-gray-900 overflow-x-hidden">
+
+      {/* ── NAVIGATION ──────────────────────────────────── */}
+      <header className="sticky top-0 z-[1000] bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
+        <div className="max-w-7xl mx-auto px-6 h-[70px] flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <img src="/amu-logo.svg" alt="AMU Logo" className="w-11 h-11" />
+            <div>
+              <div className="font-extrabold text-lg text-primary-900 leading-tight">AMU SmartCare</div>
+              <div className="text-[10px] text-gray-400 tracking-wide">Arba Minch University</div>
+            </div>
           </div>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Link
-            to="/login"
-            style={{
-              padding: '9px 22px',
-              border: '1.5px solid #1a73e8',
-              borderRadius: 24,
-              color: '#1a73e8',
-              textDecoration: 'none',
-              fontSize: 14,
-              fontWeight: 600,
-            }}
-          >
-            Sign In
-          </Link>
-          <Link
-            to="/register"
-            style={{
-              padding: '9px 22px',
-              background: '#1a73e8',
-              borderRadius: 24,
-              color: '#fff',
-              textDecoration: 'none',
-              fontSize: 14,
-              fontWeight: 600,
-            }}
-          >
-            Get Started
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link to="/login" className="btn btn-outline hidden sm:inline-flex">Sign In</Link>
+            <Link to="/register" className="btn btn-primary">Get Started</Link>
+          </div>
         </div>
       </header>
 
-      {/* HERO */}
-      <section
-        style={{
-          background: 'linear-gradient(135deg, #0d47a1 0%, #1a73e8 50%, #1565c0 100%)',
-          padding: '80px 32px',
-          textAlign: 'center',
-          position: 'relative',
-          overflow: 'hidden',
-        }}
-      >
-        <div style={{ position: 'absolute', top: -60, right: -60, width: 300, height: 300, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
-        <div style={{ position: 'absolute', bottom: -80, left: -80, width: 400, height: 400, borderRadius: '50%', background: 'rgba(255,255,255,0.04)' }} />
-
-        <div style={{ position: 'relative', maxWidth: 800, margin: '0 auto' }}>
-          <img
-            src="/amu-logo.svg"
-            alt="Arba Minch University Logo"
-            style={{ width: 100, height: 100, marginBottom: 28, filter: 'drop-shadow(0 4px 16px rgba(0,0,0,0.3))' }}
-          />
-          <h1
-            style={{
-              margin: '0 0 20px',
-              fontSize: 'clamp(28px, 5vw, 52px)',
-              fontWeight: 800,
-              color: '#fff',
-              lineHeight: 1.2,
-              letterSpacing: -0.5,
-            }}
-          >
+      {/* ── HERO ────────────────────────────────────────── */}
+      <section className="bg-gradient-to-br from-primary-900 via-primary-700 to-primary-500 py-24 px-6 text-center relative overflow-hidden">
+        <div className="absolute -top-16 -right-16 w-72 h-72 rounded-full bg-white/5" />
+        <div className="absolute -bottom-20 -left-20 w-96 h-96 rounded-full bg-white/[0.04]" />
+        <div className="relative max-w-3xl mx-auto">
+          <img src="/amu-logo.svg" alt="Arba Minch University Logo" className="w-24 h-24 mx-auto mb-8 drop-shadow-2xl" />
+          <h1 className="text-4xl sm:text-5xl font-extrabold text-white leading-tight tracking-tight mb-5">
             Smart Healthcare for<br />
-            <span style={{ color: '#f4b400' }}>AMU Community</span>
+            <span className="text-accent-400">AMU Community</span>
           </h1>
-          <p
-            style={{
-              margin: '0 auto 36px',
-              fontSize: 18,
-              color: 'rgba(255,255,255,0.88)',
-              maxWidth: 560,
-              lineHeight: 1.6,
-            }}
-          >
+          <p className="text-lg text-white/85 max-w-xl mx-auto mb-10 leading-relaxed">
             Connect with verified doctors, get AI-powered health guidance, and manage your healthcare journey — all in one platform.
           </p>
-          <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link
-              to="/register"
-              style={{
-                padding: '14px 36px',
-                background: '#f4b400',
-                color: '#0d47a1',
-                textDecoration: 'none',
-                borderRadius: 32,
-                fontWeight: 700,
-                fontSize: 16,
-                boxShadow: '0 4px 20px rgba(244,180,0,0.4)',
-              }}
-            >
+          <div className="flex gap-4 justify-center flex-wrap">
+            <Link to="/register" className="btn btn-lg bg-accent-400 text-primary-900 hover:bg-accent-500 font-bold shadow-[0_4px_20px_rgba(244,180,0,0.4)]">
               Get Started Free →
             </Link>
-            <Link
-              to="/login"
-              style={{
-                padding: '14px 36px',
-                background: 'rgba(255,255,255,0.15)',
-                color: '#fff',
-                textDecoration: 'none',
-                borderRadius: 32,
-                fontWeight: 600,
-                fontSize: 16,
-                border: '1.5px solid rgba(255,255,255,0.4)',
-                backdropFilter: 'blur(4px)',
-              }}
-            >
+            <Link to="/login" className="btn btn-lg bg-white/15 text-white border border-white/40 hover:bg-white/25 backdrop-blur-sm">
               Sign In
             </Link>
           </div>
         </div>
       </section>
 
-      {/* STATS BAR */}
-      <section style={{ background: '#fff', boxShadow: '0 2px 16px rgba(0,0,0,0.08)' }}>
-        <div
-          style={{
-            maxWidth: 960,
-            margin: '0 auto',
-            display: 'grid',
-            gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: 0,
-          }}
-        >
+      {/* ── STATS ───────────────────────────────────────── */}
+      <section className="bg-white shadow-[0_2px_16px_rgba(0,0,0,0.06)]">
+        <div className="max-w-4xl mx-auto grid grid-cols-2 sm:grid-cols-4">
           {stats.map((s, i) => (
-            <div
-              key={s.label}
-              style={{
-                padding: '28px 20px',
-                textAlign: 'center',
-                borderRight: i < stats.length - 1 ? '1px solid #f0f0f0' : 'none',
-              }}
-            >
-              <div style={{ fontSize: 32, fontWeight: 800, color: '#1a73e8', lineHeight: 1 }}>{s.value}</div>
-              <div style={{ fontSize: 13, color: '#666', marginTop: 4, fontWeight: 500 }}>{s.label}</div>
+            <div key={s.label} className={`py-8 text-center ${i < stats.length - 1 ? 'border-r border-gray-100' : ''}`}>
+              <div className="text-3xl font-extrabold text-primary-500 leading-none">{s.value}</div>
+              <div className="text-xs text-gray-500 mt-1 font-medium">{s.label}</div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* FEATURES */}
-      <section style={{ padding: '80px 32px', background: '#f8f9fa' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 52 }}>
-            <div style={{ display: 'inline-block', background: '#e8f0fe', color: '#1a73e8', padding: '5px 16px', borderRadius: 20, fontSize: 13, fontWeight: 600, marginBottom: 14 }}>
-              Platform Features
-            </div>
-            <h2 style={{ margin: '0 0 14px', fontSize: 'clamp(24px, 4vw, 36px)', fontWeight: 800, color: '#0d47a1' }}>
+      {/* ── FEATURES ────────────────────────────────────── */}
+      <section className="py-20 px-6 bg-gray-50">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-14">
+            <span className="section-tag">Platform Features</span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-primary-900 mb-3">
               Everything You Need for Better Health
             </h2>
-            <p style={{ margin: '0 auto', fontSize: 16, color: '#555', maxWidth: 520, lineHeight: 1.6 }}>
-              A comprehensive healthcare platform designed specifically for the Arba Minch University community
+            <p className="text-gray-500 max-w-xl mx-auto text-base leading-relaxed">
+              A comprehensive healthcare platform designed for the Arba Minch University community
             </p>
           </div>
-
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-              gap: 24,
-            }}
-          >
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((f) => (
-              <div
-                key={f.title}
-                style={{
-                  background: '#fff',
-                  borderRadius: 16,
-                  padding: '28px 24px',
-                  boxShadow: '0 2px 16px rgba(0,0,0,0.06)',
-                  border: '1px solid #f0f0f0',
-                  transition: 'transform 0.2s, box-shadow 0.2s',
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.transform = 'translateY(-4px)';
-                  (e.currentTarget as HTMLElement).style.boxShadow = '0 12px 32px rgba(0,0,0,0.12)';
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.transform = '';
-                  (e.currentTarget as HTMLElement).style.boxShadow = '0 2px 16px rgba(0,0,0,0.06)';
-                }}
-              >
-                <div
-                  style={{
-                    width: 52,
-                    height: 52,
-                    borderRadius: 14,
-                    background: `${f.color}22`,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: 26,
-                    marginBottom: 16,
-                  }}
-                >
+              <div key={f.title} className="card-hover p-7">
+                <div className={`w-13 h-13 w-12 h-12 rounded-2xl ${f.bg} flex items-center justify-center text-2xl mb-5`}>
                   {f.icon}
                 </div>
-                <h3 style={{ margin: '0 0 8px', fontSize: 17, fontWeight: 700, color: '#1a1a2e' }}>{f.title}</h3>
-                <p style={{ margin: 0, fontSize: 14, color: '#666', lineHeight: 1.6 }}>{f.desc}</p>
+                <h3 className="text-base font-bold text-gray-800 mb-2">{f.title}</h3>
+                <p className="text-sm text-gray-500 leading-relaxed">{f.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* HOW IT WORKS */}
-      <section style={{ padding: '80px 32px', background: '#fff' }}>
-        <div style={{ maxWidth: 900, margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 52 }}>
-            <div style={{ display: 'inline-block', background: '#e8f0fe', color: '#1a73e8', padding: '5px 16px', borderRadius: 20, fontSize: 13, fontWeight: 600, marginBottom: 14 }}>
-              How It Works
-            </div>
-            <h2 style={{ margin: '0 0 14px', fontSize: 'clamp(24px, 4vw, 36px)', fontWeight: 800, color: '#0d47a1' }}>
+      {/* ── HOW IT WORKS ────────────────────────────────── */}
+      <section className="py-20 px-6 bg-white">
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center mb-14">
+            <span className="section-tag">How It Works</span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-primary-900">
               Get Started in 3 Simple Steps
             </h2>
           </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 32 }}>
-            {steps.map((step, idx) => (
-              <div key={step.num} style={{ textAlign: 'center', position: 'relative' }}>
-                {idx < steps.length - 1 && (
-                  <div
-                    style={{
-                      position: 'absolute',
-                      top: 32,
-                      right: -16,
-                      width: 32,
-                      height: 2,
-                      background: '#e0e0e0',
-                    }}
-                  />
-                )}
-                <div
-                  style={{
-                    width: 64,
-                    height: 64,
-                    borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #1a73e8, #0d47a1)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    margin: '0 auto 20px',
-                    fontSize: 28,
-                    boxShadow: '0 4px 20px rgba(26,115,232,0.35)',
-                  }}
-                >
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-10">
+            {steps.map((step) => (
+              <div key={step.num} className="text-center">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary-500 to-primary-900 flex items-center justify-center mx-auto mb-5 text-3xl shadow-[0_4px_20px_rgba(26,115,232,0.35)]">
                   {step.icon}
                 </div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: '#1a73e8', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 8 }}>
-                  STEP {step.num}
+                <div className="text-[11px] font-bold text-primary-500 uppercase tracking-widest mb-2">
+                  Step {step.num}
                 </div>
-                <h3 style={{ margin: '0 0 10px', fontSize: 18, fontWeight: 700, color: '#0d47a1' }}>{step.title}</h3>
-                <p style={{ margin: 0, fontSize: 14, color: '#666', lineHeight: 1.6 }}>{step.desc}</p>
+                <h3 className="text-lg font-bold text-primary-900 mb-2">{step.title}</h3>
+                <p className="text-sm text-gray-500 leading-relaxed">{step.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA BANNER */}
-      <section
-        style={{
-          background: 'linear-gradient(135deg, #0d47a1, #1a73e8)',
-          padding: '64px 32px',
-          textAlign: 'center',
-        }}
-      >
-        <h2 style={{ margin: '0 0 14px', fontSize: 'clamp(22px, 4vw, 36px)', fontWeight: 800, color: '#fff' }}>
+      {/* ── CTA BANNER ──────────────────────────────────── */}
+      <section className="bg-gradient-to-r from-primary-900 to-primary-500 py-20 px-6 text-center">
+        <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4">
           Ready to Transform Your Healthcare Experience?
         </h2>
-        <p style={{ margin: '0 auto 32px', fontSize: 16, color: 'rgba(255,255,255,0.85)', maxWidth: 480 }}>
+        <p className="text-white/80 text-base max-w-md mx-auto mb-10">
           Join thousands of AMU community members already benefiting from AMU SmartCare.
         </p>
-        <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
-          <Link
-            to="/register"
-            style={{
-              padding: '14px 36px',
-              background: '#f4b400',
-              color: '#0d47a1',
-              textDecoration: 'none',
-              borderRadius: 32,
-              fontWeight: 700,
-              fontSize: 16,
-            }}
-          >
+        <div className="flex gap-4 justify-center flex-wrap">
+          <Link to="/register" className="btn btn-lg bg-accent-400 text-primary-900 hover:bg-accent-500 font-bold">
             Create Free Account
           </Link>
-          <Link
-            to="/login"
-            style={{
-              padding: '14px 36px',
-              background: 'rgba(255,255,255,0.15)',
-              color: '#fff',
-              textDecoration: 'none',
-              borderRadius: 32,
-              fontWeight: 600,
-              fontSize: 16,
-              border: '1.5px solid rgba(255,255,255,0.5)',
-            }}
-          >
+          <Link to="/login" className="btn btn-lg bg-white/15 text-white border border-white/50 hover:bg-white/25">
             Sign In
           </Link>
         </div>
       </section>
 
-      {/* FOOTER */}
-      <footer style={{ background: '#0a1628', color: '#aaa', padding: '48px 32px 24px' }}>
-        <div
-          style={{
-            maxWidth: 1100,
-            margin: '0 auto',
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-            gap: 32,
-            marginBottom: 40,
-          }}
-        >
+      {/* ── FOOTER ──────────────────────────────────────── */}
+      <footer className="bg-[#0a1628] text-gray-400 px-6 pt-14 pb-8">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-10">
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
-              <img src="/amu-logo.svg" alt="AMU" style={{ width: 36, height: 36 }} />
-              <span style={{ fontWeight: 700, fontSize: 16, color: '#fff' }}>AMU SmartCare</span>
+            <div className="flex items-center gap-2.5 mb-4">
+              <img src="/amu-logo.svg" alt="AMU" className="w-9 h-9" />
+              <span className="font-bold text-base text-white">AMU SmartCare</span>
             </div>
-            <p style={{ margin: 0, fontSize: 13, lineHeight: 1.7, maxWidth: 220 }}>
-              Smart healthcare platform for Arba Minch University community members.
+            <p className="text-sm leading-relaxed max-w-[200px]">
+              Smart healthcare platform for the Arba Minch University community.
             </p>
           </div>
           <div>
-            <h4 style={{ margin: '0 0 14px', color: '#fff', fontSize: 14, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5 }}>Platform</h4>
+            <h4 className="text-white text-xs font-bold uppercase tracking-wider mb-4">Platform</h4>
             {['Find Doctors', 'Book Consultation', 'AI Assistant', 'Student Resources'].map((item) => (
-              <div key={item} style={{ marginBottom: 8 }}>
-                <Link to="/login" style={{ color: '#888', textDecoration: 'none', fontSize: 13 }}>{item}</Link>
+              <div key={item} className="mb-2">
+                <Link to="/login" className="text-gray-500 text-sm hover:text-gray-300 transition-colors">{item}</Link>
               </div>
             ))}
           </div>
           <div>
-            <h4 style={{ margin: '0 0 14px', color: '#fff', fontSize: 14, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5 }}>Company</h4>
+            <h4 className="text-white text-xs font-bold uppercase tracking-wider mb-4">Company</h4>
             {['About AMU', 'Contact Us', 'Privacy Policy', 'Terms of Service'].map((item) => (
-              <div key={item} style={{ marginBottom: 8 }}>
-                <span style={{ color: '#888', fontSize: 13, cursor: 'pointer' }}>{item}</span>
+              <div key={item} className="mb-2">
+                <span className="text-gray-500 text-sm cursor-pointer hover:text-gray-300 transition-colors">{item}</span>
               </div>
             ))}
           </div>
           <div>
-            <h4 style={{ margin: '0 0 14px', color: '#fff', fontSize: 14, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5 }}>Contact</h4>
-            <p style={{ margin: '0 0 8px', fontSize: 13 }}>📍 Arba Minch, Ethiopia</p>
-            <p style={{ margin: '0 0 8px', fontSize: 13 }}>📧 info@amu.edu.et</p>
-            <p style={{ margin: 0, fontSize: 13 }}>🌐 www.amu.edu.et</p>
+            <h4 className="text-white text-xs font-bold uppercase tracking-wider mb-4">Contact</h4>
+            <p className="text-sm mb-2">📍 Arba Minch, Ethiopia</p>
+            <p className="text-sm mb-2">📧 info@amu.edu.et</p>
+            <p className="text-sm">🌐 www.amu.edu.et</p>
           </div>
         </div>
-        <div
-          style={{
-            borderTop: '1px solid rgba(255,255,255,0.08)',
-            paddingTop: 20,
-            textAlign: 'center',
-            fontSize: 12,
-            color: '#666',
-          }}
-        >
+        <div className="border-t border-white/[0.07] pt-6 text-center text-xs text-gray-600">
           © {new Date().getFullYear()} AMU SmartCare · Arba Minch University · All rights reserved.
         </div>
       </footer>
