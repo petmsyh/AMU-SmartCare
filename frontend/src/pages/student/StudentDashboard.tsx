@@ -4,11 +4,13 @@ import { RootState } from '../../store';
 
 const StudentDashboard: React.FC = () => {
   const { user } = useSelector((state: RootState) => state.auth);
-  const [messages, setMessages] = React.useState<{ role: 'user' | 'assistant'; content: string }[]>([
+  const [messages, setMessages] = React.useState<
+    { role: 'user' | 'assistant'; content: string }[]
+  >([
     {
       role: 'assistant',
       content:
-        'Hello! I\'m your academic health assistant. I can help you with medical studies, anatomy, pharmacology, and more. What would you like to learn today?',
+        "Hello! I'm your academic health assistant. I can help you with medical studies, anatomy, pharmacology, and more. What would you like to learn today?",
     },
   ]);
   const [input, setInput] = React.useState('');
@@ -27,7 +29,8 @@ const StudentDashboard: React.FC = () => {
     setLoading(true);
 
     const responses: Record<string, string> = {
-      default: 'That\'s a great question for your studies! As a medical student, understanding the pathophysiology is key. I recommend reviewing Harrison\'s Principles of Internal Medicine for detailed clinical correlations.',
+      default:
+        "That's a great question for your studies! As a medical student, understanding the pathophysiology is key. I recommend reviewing Harrison's Principles of Internal Medicine for detailed clinical correlations.",
     };
     await new Promise((r) => setTimeout(r, 800));
     setMessages((prev) => [
@@ -61,64 +64,32 @@ const StudentDashboard: React.FC = () => {
   return (
     <div>
       {/* Hero */}
-      <div
-        style={{
-          background: 'linear-gradient(135deg, #0d47a1 0%, #7b1fa2 100%)',
-          borderRadius: 16,
-          padding: '32px 28px',
-          color: '#fff',
-          marginBottom: 24,
-          position: 'relative',
-          overflow: 'hidden',
-        }}
-      >
-        <div style={{ position: 'absolute', top: -40, right: -40, width: 180, height: 180, borderRadius: '50%', background: 'rgba(255,255,255,0.07)' }} />
-        <div style={{ position: 'relative' }}>
-          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', opacity: 0.75, marginBottom: 8 }}>
+      <div className="relative mb-6 overflow-hidden rounded-2xl bg-gradient-to-br from-primary-900 to-purple-700 px-7 py-8 text-white">
+        <div className="absolute -right-10 -top-10 h-44 w-44 rounded-full bg-white/[0.07]" />
+        <div className="relative">
+          <div className="mb-2 text-xs font-bold uppercase tracking-widest opacity-75">
             Student Portal
           </div>
-          <h1 style={{ margin: '0 0 6px', fontSize: 28, fontWeight: 800 }}>
-            Welcome, {user?.username}! 🎓
+          <h1 className="mb-1.5 text-3xl font-extrabold">
+            Welcome, {user?.username}! ��
           </h1>
-          <p style={{ margin: 0, opacity: 0.85, fontSize: 14 }}>
+          <p className="m-0 text-sm opacity-85">
             Academic Health Assistant — For Medical Students
           </p>
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 20, alignItems: 'start' }}>
+      <div className="grid grid-cols-[1fr_2fr] items-start gap-5">
         {/* Topics sidebar */}
-        <div
-          style={{
-            background: '#fff',
-            border: '1px solid #f0f0f0',
-            borderRadius: 14,
-            padding: 20,
-            boxShadow: '0 2px 10px rgba(0,0,0,0.06)',
-          }}
-        >
-          <h3 style={{ margin: '0 0 14px', fontSize: 15, fontWeight: 700, color: '#1a1a2e' }}>📚 Study Topics</h3>
+        <div className="card p-5">
+          <h3 className="mb-3.5 text-sm font-bold text-gray-900">
+            �� Study Topics
+          </h3>
           {topics.map((topic) => (
             <button
               key={topic}
               onClick={() => setInput(`Tell me about ${topic.slice(2)}`)}
-              style={{
-                display: 'block',
-                width: '100%',
-                textAlign: 'left',
-                padding: '9px 12px',
-                border: '1px solid #eee',
-                borderRadius: 8,
-                cursor: 'pointer',
-                marginBottom: 6,
-                fontSize: 13,
-                background: '#f8f9fa',
-                color: '#333',
-                fontWeight: 500,
-                transition: 'background 0.15s',
-              }}
-              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = '#e8f0fe'; }}
-              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = '#f8f9fa'; }}
+              className="mb-1.5 block w-full cursor-pointer rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5 text-left text-sm font-medium text-gray-700 transition-colors hover:bg-primary-50"
             >
               {topic}
             </button>
@@ -126,95 +97,57 @@ const StudentDashboard: React.FC = () => {
         </div>
 
         {/* Chat panel */}
-        <div
-          style={{
-            background: '#fff',
-            border: '1px solid #f0f0f0',
-            borderRadius: 14,
-            overflow: 'hidden',
-            boxShadow: '0 2px 10px rgba(0,0,0,0.06)',
-          }}
-        >
-          <div
-            style={{
-              padding: '14px 18px',
-              background: 'linear-gradient(135deg, #0d47a1, #7b1fa2)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 10,
-            }}
-          >
-            <span style={{ fontSize: 20 }}>🤖</span>
+        <div className="card overflow-hidden">
+          <div className="flex items-center gap-2.5 bg-gradient-to-br from-primary-900 to-purple-700 px-5 py-3.5">
+            <span className="text-xl">🤖</span>
             <div>
-              <div style={{ fontWeight: 700, fontSize: 14, color: '#fff' }}>AI Academic Assistant</div>
-              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.75)' }}>Powered by AMU SmartCare</div>
+              <div className="text-sm font-bold text-white">
+                AI Academic Assistant
+              </div>
+              <div className="text-xs text-white/75">
+                Powered by AMU SmartCare
+              </div>
             </div>
           </div>
-          <div
-            style={{
-              height: 380,
-              overflowY: 'auto',
-              padding: 16,
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 10,
-              background: '#fafbfc',
-            }}
-          >
+          <div className="flex h-96 flex-col gap-2.5 overflow-y-auto bg-gray-50/60 p-4">
             {messages.map((msg, i) => (
               <div
                 key={i}
-                style={{
-                  alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start',
-                  maxWidth: '80%',
-                }}
+                className={`max-w-[80%] ${msg.role === 'user' ? 'self-end' : 'self-start'}`}
               >
                 <div
-                  style={{
-                    background: msg.role === 'user' ? 'linear-gradient(135deg, #0d47a1, #7b1fa2)' : '#fff',
-                    color: msg.role === 'user' ? '#fff' : '#333',
-                    padding: '10px 14px',
-                    borderRadius: msg.role === 'user' ? '14px 14px 0 14px' : '14px 14px 14px 0',
-                    fontSize: 13,
-                    lineHeight: 1.5,
-                    boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
-                  }}
+                  className={`px-3.5 py-2.5 text-sm leading-relaxed shadow-sm ${
+                    msg.role === 'user'
+                      ? 'rounded-t-2xl rounded-bl-2xl rounded-br-none bg-gradient-to-br from-primary-900 to-purple-700 text-white'
+                      : 'rounded-t-2xl rounded-bl-none rounded-br-2xl bg-white text-gray-700'
+                  }`}
                 >
                   {msg.content}
                 </div>
               </div>
             ))}
             {loading && (
-              <div style={{ alignSelf: 'flex-start' }}>
-                <div style={{ background: '#fff', padding: '10px 14px', borderRadius: '14px 14px 14px 0', fontSize: 13, color: '#888', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
+              <div className="self-start">
+                <div className="rounded-t-2xl rounded-bl-none rounded-br-2xl bg-white px-3.5 py-2.5 text-sm text-gray-400 shadow-sm">
                   Thinking…
                 </div>
               </div>
             )}
             <div ref={bottomRef} />
           </div>
-          <div style={{ padding: '12px 14px', borderTop: '1px solid #f0f0f0', display: 'flex', gap: 8, background: '#fff' }}>
+          <div className="flex gap-2 border-t border-gray-100 bg-white p-3.5">
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Ask a medical/academic question…"
               rows={2}
-              style={{ flex: 1, resize: 'none', border: '1.5px solid #e8e8e8', borderRadius: 8, padding: '8px 10px', fontSize: 13, fontFamily: 'inherit', outline: 'none' }}
+              className="form-input flex-1 resize-none"
             />
             <button
               onClick={handleSend}
               disabled={loading || !input.trim()}
-              style={{
-                padding: '0 18px',
-                background: loading || !input.trim() ? '#ccc' : 'linear-gradient(135deg, #0d47a1, #7b1fa2)',
-                color: '#fff',
-                border: 'none',
-                borderRadius: 8,
-                cursor: loading || !input.trim() ? 'not-allowed' : 'pointer',
-                fontSize: 13,
-                fontWeight: 700,
-              }}
+              className="btn-primary px-5 font-bold disabled:cursor-not-allowed disabled:opacity-50"
             >
               Send
             </button>

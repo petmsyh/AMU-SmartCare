@@ -9,6 +9,22 @@ import {
   resetWallets,
 } from '../../store/slices/paymentsSlice';
 
+const typeColorClasses: Record<string, string> = {
+  payment: 'text-success-500',
+  escrow_hold: 'text-primary-500',
+  escrow_release: 'text-primary-900',
+  refund: 'text-danger-500',
+  withdrawal: 'text-orange-700',
+  commission: 'text-purple-700',
+};
+
+const statusBadgeClasses: Record<string, string> = {
+  pending: 'bg-orange-100 text-orange-700',
+  completed: 'bg-success-100 text-success-700',
+  failed: 'bg-danger-100 text-danger-700',
+  refunded: 'bg-purple-100 text-purple-700',
+};
+
 const MockPaymentDashboard: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { allTransactions, loading } = useSelector((state: RootState) => state.payments);
@@ -63,21 +79,6 @@ const MockPaymentDashboard: React.FC = () => {
     }
   };
 
-  const typeColors: Record<string, string> = {
-    payment: '#34a853',
-    escrow_hold: '#1a73e8',
-    escrow_release: '#0d47a1',
-    refund: '#ea4335',
-    withdrawal: '#e65100',
-    commission: '#6a1b9a',
-  };
-
-  const statusColors: Record<string, { bg: string; color: string }> = {
-    pending: { bg: '#fff3e0', color: '#e65100' },
-    completed: { bg: '#e8f5e9', color: '#2e7d32' },
-    failed: { bg: '#fce8e6', color: '#c5221f' },
-    refunded: { bg: '#f3e5f5', color: '#6a1b9a' },
-  };
   const formatAmount = (value: unknown) => {
     const numericValue = Number(value ?? 0);
     return Number.isFinite(numericValue) ? numericValue.toFixed(2) : '0.00';
@@ -85,147 +86,82 @@ const MockPaymentDashboard: React.FC = () => {
 
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-        <h2 style={{ margin: 0, fontSize: 22 }}>Mock Payment Dashboard</h2>
+      <div className="flex items-center justify-between mb-5">
+        <h2 className="m-0 text-[22px] font-semibold">Mock Payment Dashboard</h2>
         <button
           onClick={handleResetWallets}
           disabled={resetting}
-          style={{
-            padding: '8px 18px',
-            background: '#c62828',
-            color: '#fff',
-            border: 'none',
-            borderRadius: 6,
-            cursor: resetting ? 'not-allowed' : 'pointer',
-            fontSize: 13,
-            fontWeight: 600,
-            opacity: resetting ? 0.7 : 1,
-          }}
+          className={`px-4 py-2 bg-red-800 text-white border-0 rounded-md cursor-pointer text-[13px] font-semibold
+            ${resetting ? 'opacity-70 cursor-not-allowed' : ''}`}
         >
           {resetting ? 'Resetting…' : '🔄 Reset All Wallets'}
         </button>
       </div>
 
       {actionMsg && (
-        <div
-          style={{
-            background: '#e8f5e9',
-            color: '#2e7d32',
-            padding: '8px 14px',
-            borderRadius: 6,
-            marginBottom: 14,
-            fontSize: 13,
-          }}
-        >
+        <div className="bg-success-100 text-success-700 px-3.5 py-2 rounded-md mb-3.5 text-[13px]">
           ✅ {actionMsg}
         </div>
       )}
 
-      {loading && <p style={{ color: '#666' }}>Loading transactions…</p>}
+      {loading && <p className="text-gray-500">Loading transactions…</p>}
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div className="flex flex-col gap-2.5">
         {allTransactions.map((tx) => {
-          const s = statusColors[tx.status] || { bg: '#f5f5f5', color: '#333' };
+          const statusBadge = statusBadgeClasses[tx.status] ?? 'bg-gray-100 text-gray-600';
+          const typeClass = typeColorClasses[tx.type] ?? 'text-gray-800';
           return (
             <div
               key={tx.id}
-              style={{
-                background: '#fff',
-                border: '1px solid #e0e0e0',
-                borderRadius: 8,
-                padding: '14px 18px',
-                boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
-              }}
+              className="bg-white border border-gray-200 rounded-lg px-[18px] py-3.5 shadow-sm"
             >
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  justifyContent: 'space-between',
-                  gap: 12,
-                  flexWrap: 'wrap',
-                }}
-              >
-                <div style={{ flex: 1, minWidth: 200 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                    <span
-                      style={{
-                        color: typeColors[tx.type] || '#333',
-                        fontWeight: 700,
-                        fontSize: 12,
-                        textTransform: 'uppercase',
-                      }}
-                    >
+              <div className="flex items-start justify-between gap-3 flex-wrap">
+                <div className="flex-1 min-w-[200px]">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className={`${typeClass} font-bold text-xs uppercase`}>
                       {tx.type.replace(/_/g, ' ')}
                     </span>
-                    <span
-                      style={{
-                        background: s.bg,
-                        color: s.color,
-                        fontSize: 10,
-                        padding: '1px 6px',
-                        borderRadius: 8,
-                        fontWeight: 600,
-                      }}
-                    >
+                    <span className={`${statusBadge} text-[10px] px-1.5 py-0.5 rounded-full font-semibold`}>
                       {tx.status.toUpperCase()}
                     </span>
                     {tx.transactionMode === 'mock' && (
-                      <span
-                        style={{
-                          background: '#e3f2fd',
-                          color: '#1565c0',
-                          fontSize: 10,
-                          padding: '1px 6px',
-                          borderRadius: 8,
-                          fontWeight: 600,
-                        }}
-                      >
+                      <span className="bg-blue-50 text-blue-700 text-[10px] px-1.5 py-0.5 rounded-full font-semibold">
                         MOCK
                       </span>
                     )}
                     {tx.escrowState && (
-                      <span
-                        style={{
-                          background: '#f3e5f5',
-                          color: '#6a1b9a',
-                          fontSize: 10,
-                          padding: '1px 6px',
-                          borderRadius: 8,
-                          fontWeight: 600,
-                        }}
-                      >
+                      <span className="bg-purple-100 text-purple-700 text-[10px] px-1.5 py-0.5 rounded-full font-semibold">
                         ESCROW: {tx.escrowState.toUpperCase()}
                       </span>
                     )}
                   </div>
-                  <div style={{ fontSize: 12, color: '#666' }}>
+                  <div className="text-xs text-gray-500">
                     User: {tx.userId} &bull; Amount: <strong>₹{formatAmount(tx.amount)}</strong> &bull;{' '}
                     {new Date(tx.createdAt).toLocaleString()}
                   </div>
                   {tx.description && (
-                    <div style={{ fontSize: 11, color: '#888', marginTop: 2 }}>{tx.description}</div>
+                    <div className="text-[11px] text-gray-400 mt-0.5">{tx.description}</div>
                   )}
                 </div>
 
-                <div style={{ display: 'flex', gap: 6, flexShrink: 0, flexWrap: 'wrap' }}>
+                <div className="flex gap-1.5 flex-shrink-0 flex-wrap">
                   {tx.transactionMode === 'mock' && tx.status === 'pending' && (
                     <>
                       <button
                         onClick={() => handleOutcome(tx.id, 'success')}
-                        style={{ padding: '4px 10px', background: '#34a853', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: 11, fontWeight: 600 }}
+                        className="px-2.5 py-1 bg-success-500 text-white border-0 rounded cursor-pointer text-[11px] font-semibold"
                       >
                         ✅ Success
                       </button>
                       <button
                         onClick={() => handleOutcome(tx.id, 'failure')}
-                        style={{ padding: '4px 10px', background: '#ea4335', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: 11, fontWeight: 600 }}
+                        className="px-2.5 py-1 bg-danger-500 text-white border-0 rounded cursor-pointer text-[11px] font-semibold"
                       >
                         ❌ Fail
                       </button>
                       <button
                         onClick={() => handleOutcome(tx.id, 'timeout')}
-                        style={{ padding: '4px 10px', background: '#fbbc04', color: '#333', border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: 11, fontWeight: 600 }}
+                        className="px-2.5 py-1 bg-accent-400 text-gray-800 border-0 rounded cursor-pointer text-[11px] font-semibold"
                       >
                         ⏱ Timeout
                       </button>
@@ -235,13 +171,13 @@ const MockPaymentDashboard: React.FC = () => {
                     <>
                       <button
                         onClick={() => handleRelease(tx.id)}
-                        style={{ padding: '4px 10px', background: '#1a73e8', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: 11, fontWeight: 600 }}
+                        className="px-2.5 py-1 bg-primary-500 text-white border-0 rounded cursor-pointer text-[11px] font-semibold"
                       >
                         Release Escrow
                       </button>
                       <button
                         onClick={() => handleRefund(tx.id)}
-                        style={{ padding: '4px 10px', background: '#e65100', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: 11, fontWeight: 600 }}
+                        className="px-2.5 py-1 bg-orange-700 text-white border-0 rounded cursor-pointer text-[11px] font-semibold"
                       >
                         Refund Escrow
                       </button>
@@ -253,7 +189,7 @@ const MockPaymentDashboard: React.FC = () => {
           );
         })}
         {!loading && allTransactions.length === 0 && (
-          <p style={{ color: '#666', textAlign: 'center', padding: 20 }}>No transactions found.</p>
+          <p className="text-gray-500 text-center py-5">No transactions found.</p>
         )}
       </div>
     </div>

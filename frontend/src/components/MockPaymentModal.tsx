@@ -37,58 +37,35 @@ const MockPaymentModal: React.FC<MockPaymentModalProps> = ({
     }
   };
 
-  const overlayStyle: React.CSSProperties = {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    background: 'rgba(0,0,0,0.5)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 1000,
-  };
-
-  const modalStyle: React.CSSProperties = {
-    background: '#fff',
-    borderRadius: 8,
-    padding: 32,
-    width: 420,
-    boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
-  };
-
-  const outcomes: { value: MockOutcome; label: string; desc: string; color: string }[] = [
-    { value: 'success', label: '✅ Success', desc: 'Payment completes successfully', color: '#34a853' },
-    { value: 'failure', label: '❌ Failure', desc: 'Payment is declined/fails', color: '#ea4335' },
-    { value: 'timeout', label: '⏱ Timeout', desc: 'Payment times out (pending)', color: '#fbbc04' },
+  const outcomes: { value: MockOutcome; label: string; desc: string; borderCls: string; bgCls: string }[] = [
+    { value: 'success', label: '✅ Success', desc: 'Payment completes successfully', borderCls: 'border-success-500', bgCls: 'bg-success-100' },
+    { value: 'failure', label: '❌ Failure', desc: 'Payment is declined/fails', borderCls: 'border-danger-500', bgCls: 'bg-danger-100' },
+    { value: 'timeout', label: '⏱ Timeout', desc: 'Payment times out (pending)', borderCls: 'border-accent-400', bgCls: 'bg-accent-50' },
   ];
 
   return (
-    <div style={overlayStyle} onClick={onClose}>
-      <div style={modalStyle} onClick={(e) => e.stopPropagation()}>
-        <h2 style={{ margin: '0 0 8px', fontSize: 20 }}>💳 Mock Payment</h2>
-        <p style={{ color: '#666', margin: '0 0 20px', fontSize: 14 }}>
-          Consultation fee: <strong>₹{amount}</strong>
+    <div
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-[1000]"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-2xl p-8 w-full max-w-sm shadow-auth"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h2 className="text-xl font-bold text-gray-900 mb-2">💳 Mock Payment</h2>
+        <p className="text-sm text-gray-500 mb-5">
+          Consultation fee: <strong className="text-gray-800">₹{amount}</strong>
           <br />
           Select a simulated payment outcome:
         </p>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 20 }}>
+        <div className="flex flex-col gap-2 mb-5">
           {outcomes.map((o) => (
             <label
               key={o.value}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 12,
-                padding: '10px 14px',
-                border: `2px solid ${outcome === o.value ? o.color : '#e0e0e0'}`,
-                borderRadius: 6,
-                cursor: 'pointer',
-                background: outcome === o.value ? `${o.color}10` : '#fff',
-                transition: 'all 0.15s',
-              }}
+              className={`flex items-center gap-3 p-3 border-2 rounded-xl cursor-pointer transition-all ${
+                outcome === o.value ? `${o.borderCls} ${o.bgCls}` : 'border-gray-200 bg-white'
+              }`}
             >
               <input
                 type="radio"
@@ -96,60 +73,27 @@ const MockPaymentModal: React.FC<MockPaymentModalProps> = ({
                 value={o.value}
                 checked={outcome === o.value}
                 onChange={() => setOutcome(o.value)}
-                style={{ accentColor: o.color }}
+                className="accent-primary-500"
               />
               <div>
-                <div style={{ fontWeight: 600, fontSize: 14 }}>{o.label}</div>
-                <div style={{ fontSize: 12, color: '#666' }}>{o.desc}</div>
+                <div className="font-semibold text-sm text-gray-800">{o.label}</div>
+                <div className="text-xs text-gray-500">{o.desc}</div>
               </div>
             </label>
           ))}
         </div>
 
         {error && (
-          <div
-            style={{
-              background: '#fce8e6',
-              color: '#c5221f',
-              padding: '8px 12px',
-              borderRadius: 4,
-              marginBottom: 16,
-              fontSize: 14,
-            }}
-          >
+          <div className="bg-danger-100 text-danger-700 px-4 py-2.5 rounded-xl text-sm mb-4">
             {error}
           </div>
         )}
 
-        <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-          <button
-            onClick={onClose}
-            style={{
-              padding: '8px 16px',
-              border: '1px solid #ddd',
-              borderRadius: 4,
-              cursor: 'pointer',
-              background: '#fff',
-              fontSize: 14,
-            }}
-          >
+        <div className="flex gap-2 justify-end">
+          <button onClick={onClose} className="btn-ghost btn-sm">
             Cancel
           </button>
-          <button
-            onClick={handlePay}
-            disabled={loading}
-            style={{
-              padding: '8px 20px',
-              background: '#1a73e8',
-              color: '#fff',
-              border: 'none',
-              borderRadius: 4,
-              cursor: loading ? 'not-allowed' : 'pointer',
-              opacity: loading ? 0.7 : 1,
-              fontSize: 14,
-              fontWeight: 600,
-            }}
-          >
+          <button onClick={handlePay} disabled={loading} className="btn-primary btn-sm">
             {loading ? 'Processing…' : 'Pay Now'}
           </button>
         </div>

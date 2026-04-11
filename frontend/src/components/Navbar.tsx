@@ -14,42 +14,20 @@ const Navbar: React.FC = () => {
     navigate('/login');
   };
 
-  const navStyle: React.CSSProperties = {
-    background: '#1a73e8',
-    color: '#fff',
-    padding: '0 24px',
-    height: 56,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
-    position: 'sticky',
-    top: 0,
-    zIndex: 100,
-  };
-
   return (
-    <nav style={navStyle}>
-      <Link to="/" style={{ color: '#fff', textDecoration: 'none', fontWeight: 700, fontSize: 20 }}>
+    <nav className="bg-primary-500 text-white px-6 h-14 flex items-center justify-between shadow-md sticky top-0 z-[100]">
+      <Link to="/" className="text-white font-bold text-xl no-underline">
         AMU SmartCare
       </Link>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+      <div className="flex items-center gap-4">
         {user && (
           <>
-            <span style={{ fontSize: 14 }}>
+            <span className="text-sm text-white/90">
               {user.username} ({user.role})
             </span>
             <button
               onClick={handleLogout}
-              style={{
-                background: 'rgba(255,255,255,0.2)',
-                border: '1px solid rgba(255,255,255,0.5)',
-                color: '#fff',
-                padding: '6px 14px',
-                borderRadius: 4,
-                cursor: 'pointer',
-                fontSize: 14,
-              }}
+              className="bg-white/20 border border-white/50 text-white px-3.5 py-1.5 rounded-lg text-sm font-medium hover:bg-white/30 transition-colors"
             >
               Logout
             </button>

@@ -11,7 +11,7 @@ const RatingStars: React.FC<RatingStarsProps> = ({ value, max = 5, onChange, siz
   const [hovered, setHovered] = React.useState(0);
 
   return (
-    <span style={{ display: 'inline-flex', gap: 2 }}>
+    <span className="inline-flex gap-0.5">
       {Array.from({ length: max }, (_, i) => i + 1).map((star) => {
         const filled = star <= (hovered || value);
         return (
@@ -20,13 +20,8 @@ const RatingStars: React.FC<RatingStarsProps> = ({ value, max = 5, onChange, siz
             onClick={() => onChange && onChange(star)}
             onMouseEnter={() => onChange && setHovered(star)}
             onMouseLeave={() => onChange && setHovered(0)}
-            style={{
-              fontSize: size,
-              cursor: onChange ? 'pointer' : 'default',
-              color: filled ? '#f4b400' : '#ccc',
-              lineHeight: 1,
-              userSelect: 'none',
-            }}
+            className={`leading-none select-none ${onChange ? 'cursor-pointer' : 'cursor-default'} ${filled ? 'text-accent-400' : 'text-gray-300'}`}
+            style={{ fontSize: size }}
           >
             ★
           </span>

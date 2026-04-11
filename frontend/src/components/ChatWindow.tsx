@@ -44,40 +44,13 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ consultationId, disabled = fals
   };
 
   return (
-    <div
-      style={{
-        border: '1px solid #e0e0e0',
-        borderRadius: 8,
-        display: 'flex',
-        flexDirection: 'column',
-        height: 400,
-        background: '#fff',
-      }}
-    >
-      <div
-        style={{
-          padding: '8px 12px',
-          borderBottom: '1px solid #e0e0e0',
-          fontWeight: 600,
-          background: '#f8f9fa',
-          borderRadius: '8px 8px 0 0',
-          fontSize: 14,
-        }}
-      >
+    <div className="border border-gray-200 rounded-lg flex flex-col h-[400px] bg-white">
+      <div className="px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50 rounded-t-lg text-sm">
         💬 Consultation Chat
       </div>
-      <div
-        style={{
-          flex: 1,
-          overflowY: 'auto',
-          padding: 12,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 8,
-        }}
-      >
+      <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-2">
         {messages.length === 0 && (
-          <p style={{ color: '#999', fontSize: 13, textAlign: 'center', margin: 'auto' }}>
+          <p className="text-gray-400 text-[13px] text-center m-auto">
             No messages yet
           </p>
         )}
@@ -86,31 +59,18 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ consultationId, disabled = fals
           return (
             <div
               key={msg.id}
-              style={{
-                alignSelf: isOwn ? 'flex-end' : 'flex-start',
-                maxWidth: '70%',
-              }}
+              className={`max-w-[70%] ${isOwn ? 'self-end' : 'self-start'}`}
             >
               <div
-                style={{
-                  background: isOwn ? '#1a73e8' : '#f1f3f4',
-                  color: isOwn ? '#fff' : '#333',
-                  padding: '8px 12px',
-                  borderRadius: isOwn ? '12px 12px 0 12px' : '12px 12px 12px 0',
-                  fontSize: 14,
-                  wordBreak: 'break-word',
-                }}
+                className={`px-3 py-2 text-sm break-words
+                  ${isOwn
+                    ? 'bg-primary-500 text-white rounded-[12px_12px_0_12px]'
+                    : 'bg-gray-100 text-gray-800 rounded-[12px_12px_12px_0]'
+                  }`}
               >
                 {msg.content}
               </div>
-              <div
-                style={{
-                  fontSize: 11,
-                  color: '#999',
-                  marginTop: 2,
-                  textAlign: isOwn ? 'right' : 'left',
-                }}
-              >
+              <div className={`text-[11px] text-gray-400 mt-0.5 ${isOwn ? 'text-right' : 'text-left'}`}>
                 {msg.sender?.username || 'Unknown'} &bull;{' '}
                 {new Date(msg.createdAt).toLocaleTimeString()}
               </div>
@@ -120,43 +80,19 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ consultationId, disabled = fals
         <div ref={bottomRef} />
       </div>
       {!disabled && (
-        <div
-          style={{
-            padding: 8,
-            borderTop: '1px solid #e0e0e0',
-            display: 'flex',
-            gap: 8,
-          }}
-        >
+        <div className="p-2 border-t border-gray-200 flex gap-2">
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Type a message… (Enter to send)"
             rows={2}
-            style={{
-              flex: 1,
-              resize: 'none',
-              border: '1px solid #ddd',
-              borderRadius: 4,
-              padding: '6px 8px',
-              fontSize: 13,
-              fontFamily: 'inherit',
-            }}
+            className="flex-1 resize-none border border-gray-300 rounded px-2 py-1.5 text-[13px] font-[inherit]"
           />
           <button
             onClick={handleSend}
             disabled={sending || !text.trim()}
-            style={{
-              background: '#1a73e8',
-              color: '#fff',
-              border: 'none',
-              borderRadius: 4,
-              padding: '0 16px',
-              cursor: sending || !text.trim() ? 'not-allowed' : 'pointer',
-              opacity: sending || !text.trim() ? 0.6 : 1,
-              fontSize: 14,
-            }}
+            className={`btn btn-primary px-4 text-sm ${sending || !text.trim() ? 'opacity-60 cursor-not-allowed' : ''}`}
           >
             Send
           </button>
