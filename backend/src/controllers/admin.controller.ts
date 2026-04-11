@@ -19,7 +19,7 @@ export const adminController = {
     try {
       const { id } = req.params;
       const { isVerified } = req.body as { isVerified: boolean };
-      const user = await adminService.verifyUser(id, isVerified !== false);
+      const user = await adminService.verifyUser(id, isVerified === true);
       res.json({ success: true, data: user });
     } catch (err) {
       const error = err as Error & { statusCode?: number };
@@ -31,7 +31,7 @@ export const adminController = {
     try {
       const { id } = req.params;
       const { isActive } = req.body as { isActive: boolean };
-      const user = await adminService.toggleUserActive(id, isActive !== false);
+      const user = await adminService.toggleUserActive(id, isActive === true);
       res.json({ success: true, data: user });
     } catch (err) {
       const error = err as Error & { statusCode?: number };
@@ -54,7 +54,7 @@ export const adminController = {
     try {
       const { id } = req.params;
       const { isHidden } = req.body as { isHidden: boolean };
-      const rating = await adminService.toggleHideRating(id, isHidden !== false);
+      const rating = await adminService.toggleHideRating(id, isHidden === true);
       res.json({ success: true, data: rating });
     } catch (err) {
       const error = err as Error & { statusCode?: number };

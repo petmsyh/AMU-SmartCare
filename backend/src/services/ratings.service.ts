@@ -23,7 +23,7 @@ export const ratingsService = {
 
     // Update doctor average rating
     const allRatings = await prisma.rating.findMany({ where: { doctorId, isHidden: false } });
-    const avg = allRatings.reduce((sum, r) => sum + r.score, 0) / allRatings.length;
+    const avg = allRatings.length > 0 ? allRatings.reduce((sum, r) => sum + r.score, 0) / allRatings.length : 0;
     await doctorRepository.update(doctorId, { averageRating: avg, totalRatings: allRatings.length });
 
     return rating;
