@@ -291,3 +291,49 @@ AMU-SmartCare/
 | `npm run build` | Production build |
 | `npm test` | Run tests (pass-through) |
 | `npm run lint` | Run ESLint |
+
+---
+
+## Audio / Video Calling (WebRTC + Firebase)
+
+Scheduled (appointment-time-only) audio and video calls are implemented using **WebRTC** for media and **Firebase Firestore** for signaling and call-room state.
+
+### Features
+- **Scheduled-only**: join buttons are enabled 10 minutes before the scheduled consultation time and remain available for 90 minutes after.
+- **1:1 and group** calls via a peer-to-peer mesh topology (dev-grade; no TURN server required for same-network or simple NAT scenarios).
+- **Audio mode** and **Video mode**.
+- Controls: mute/unmute mic, camera on/off, end call, participant count, per-peer connection-state indicator.
+
+### Dev-only limitations
+- Uses Google's public STUN server (`stun:stun.l.google.com:19302`) only.  
+  Calls may fail across strict NATs or firewalls — add a TURN server for production use.
+- Firebase Auth is not used for signaling; participants are identified by their AMU-SmartCare user ID.
+
+### Setup: create a Firebase project
+
+1. Go to <https://console.firebase.google.com/> and create a new project (or use an existing one).
+2. Click **Add app → Web** and copy the `firebaseConfig` object.
+3. Enable **Cloud Firestore** in the Firebase console (start in *test mode* for local dev, apply the rules in step 5 before going to production).
+4. Copy `frontend/.env.example` to `frontend/.env.local` and fill in the Firebase values:
+
+   ```env
+   REACT_APP_FIREBASE_API_KEY=...
+   REACT_APP_FIREBASE_AUTH_DOMAIN=...
+   REACT_APP_FIREBASE_PROJECT_ID=...
+   REACT_APP_FIREBASE_STORAGE_BUCKET=...
+   REACT_APP_FIREBASE_MESSAGING_SENDER_ID=...
+   REACT_APP_FIREBASE_APP_ID=...
+   ```
+
+5. Deploy the security rules from `firestore.rules`:
+
+   ```bash
+   npm install -g firebase-tools
+   firebase login
+   firebase use --add   # select your project
+   firebase deploy --only firestore:rules
+   ```
+
+6. Restart the frontend dev server (`npm start` inside `frontend/`).
+
+If the `REACT_APP_FIREBASE_PROJECT_ID` env var is not set the calling features are gracefully disabled — the rest of the app continues to work normally.

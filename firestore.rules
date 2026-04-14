@@ -1,0 +1,49 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─── helpers ────────────────────────────────────────────────────────────
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isParticipant(roomData) {
+      return request.auth.uid in roomData.participantUserIds;
+    }
+
+    // ─── callRooms ──────────────────────────────────────────────────────────
+    //
+    // Only the host can create a room.
+    // Any participant can read the room doc or update the status field.
+    // No one can delete (set status = 'ended' instead).
+    //
+    match /callRooms/{roomId} {
+      allow read: if isSignedIn() && isParticipant(resource.data);
+
+      allow create: if isSignedIn()
+        && request.resource.data.hostUserId == request.auth.uid
+        && request.auth.uid in request.resource.data.participantUserIds;
+
+      allow update: if isSignedIn() && isParticipant(resource.data)
+        // Only allow updating the status field
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']);
+
+      allow delete: if false;
+
+      // ─── signals subcollection ──────────────────────────────────────────
+      //
+      // Any participant can write signals; any participant can read them.
+      //
+      match /signals/{signalId} {
+        allow read: if isSignedIn()
+          && isParticipant(get(/databases/$(database)/documents/callRooms/$(roomId)).data);
+
+        allow create: if isSignedIn()
+          && isParticipant(get(/databases/$(database)/documents/callRooms/$(roomId)).data)
+          && request.resource.data.from == request.auth.uid;
+
+        allow update, delete: if false;
+      }
+    }
+  }
+}

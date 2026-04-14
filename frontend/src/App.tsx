@@ -28,6 +28,7 @@ import DoctorWallet from './pages/doctor/DoctorWallet';
 import StudentDashboard from './pages/student/StudentDashboard';
 
 import AdminDashboard from './pages/admin/AdminDashboard';
+import CallScreen from './pages/call/CallScreen';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminRatings from './pages/admin/AdminRatings';
 import MockPaymentDashboard from './pages/admin/MockPaymentDashboard';
@@ -239,6 +240,17 @@ const App: React.FC = () => {
         />
 
         <Route path="/" element={defaultRoute()} />
+
+        {/* Call screen – rendered full-screen outside the Layout shell */}
+        <Route
+          path="/call/:roomId"
+          element={
+            <ProtectedRoute allowedRoles={['patient', 'doctor']}>
+              <CallScreen />
+            </ProtectedRoute>
+          }
+        />
+
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
