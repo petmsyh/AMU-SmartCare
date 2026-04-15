@@ -13,6 +13,15 @@ import { subscribeToSignals } from '../../firebase/callService';
 import { CallType } from '../../types/calls';
 import { isFirebaseConfigured } from '../../firebase/config';
 
+const MAX_RING_SIGNAL_AGE_MS = 45 * 1000;
+
+function isFreshRing(createdAt?: string): boolean {
+  if (!createdAt) return false;
+  const createdAtMs = Date.parse(createdAt);
+  if (Number.isNaN(createdAtMs)) return false;
+  return Date.now() - createdAtMs <= MAX_RING_SIGNAL_AGE_MS;
+}
+
 const statusClasses: Record<string, string> = {
   pending: 'bg-orange-100 text-orange-700',
   accepted: 'bg-success-100 text-success-700',
@@ -50,6 +59,7 @@ const DoctorConsultationDetail: React.FC = () => {
     try {
       unsub = subscribeToSignals(roomId, (signal) => {
         if (signal.type !== 'ring') return;
+        if (!isFreshRing(signal.createdAt)) return;
         if (!signal.id || seenSignalIdsRef.current.has(signal.id)) return;
         if (signal.from === user.id) return;
         if (signal.to && signal.to !== user.id) return;

@@ -13,6 +13,8 @@ const ICE_CONFIG: RTCConfiguration = {
   iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
 };
 
+const MAX_SIGNAL_AGE_MS = 2 * 60 * 1000;
+
 export interface RemoteStream {
   userId: string;
   stream: MediaStream;
@@ -162,6 +164,11 @@ export function useWebRTC({
 
   const handleSignal = useCallback(
     async (signal: CallSignal) => {
+      const createdAtMs = Date.parse(signal.createdAt ?? '');
+      if (!Number.isNaN(createdAtMs) && Date.now() - createdAtMs > MAX_SIGNAL_AGE_MS) {
+        return;
+      }
+
       if (!signal.id) return;
       if (processedSignalsRef.current.has(signal.id)) return;
       processedSignalsRef.current.add(signal.id);
