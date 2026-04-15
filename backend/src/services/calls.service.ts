@@ -2,7 +2,11 @@ import { CallSignalType, CallStatus, CallType } from '@prisma/client';
 import { prisma } from '../app';
 
 function roomIdFromConsultationId(consultationId: string): string {
-  return `appt-${consultationId}`;
+  return `appt-${normalizeConsultationId(consultationId)}`;
+}
+
+function normalizeConsultationId(value: string): string {
+  return value.startsWith('appt-') ? value.slice(5) : value;
 }
 
 function toDate(value?: string): Date | undefined {
@@ -37,8 +41,9 @@ export const callsService = {
     type: CallType,
     scheduledFor?: string
   ) {
+    const normalizedConsultationId = normalizeConsultationId(consultationId);
     const consultation = await prisma.consultation.findUnique({
-      where: { id: consultationId },
+      where: { id: normalizedConsultationId },
       select: {
         id: true,
         patientId: true,
@@ -55,7 +60,7 @@ export const callsService = {
       throw Object.assign(new Error('Access denied'), { statusCode: 403 });
     }
 
-    const id = roomIdFromConsultationId(consultationId);
+    const id = roomIdFromConsultationId(normalizedConsultationId);
     const participantUserIds = [consultation.patientId, consultation.doctorId];
     const existing = await prisma.callRoom.findUnique({ where: { id } });
     if (existing) {
@@ -68,7 +73,7 @@ export const callsService = {
     return prisma.callRoom.create({
       data: {
         id,
-        consultationId,
+        consultationId: normalizedConsultationId,
         hostUserId: consultation.doctorId,
         participantUserIds,
         scheduledFor: consultation.scheduledAt ?? toDate(scheduledFor) ?? undefined,
@@ -79,7 +84,17 @@ export const callsService = {
   },
 
   async getRoom(roomId: string, userId: string) {
-    return getRoomOrThrow(roomId, userId);
+    try {
+      return await getRoomOrThrow(roomId, userId);
+    } catch (err) {
+      const error = err as Error & { statusCode?: number };
+      if (error.statusCode !== 404 || !roomId.startsWith('appt-')) {
+        throw error;
+      }
+
+      const consultationId = normalizeConsultationId(roomId);
+      return this.getOrCreateRoom(consultationId, userId, CallType.video);
+    }
   },
 
   async updateRoomStatus(roomId: string, userId: string, status: CallStatus) {
