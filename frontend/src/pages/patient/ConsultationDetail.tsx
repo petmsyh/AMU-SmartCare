@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '../../store';
@@ -10,6 +10,9 @@ import {
 import ChatWindow from '../../components/ChatWindow';
 import RatingStars from '../../components/RatingStars';
 import JoinCallButton from '../../components/JoinCallButton';
+import { subscribeToSignals } from '../../firebase/callService';
+import { CallType } from '../../types/calls';
+import { isFirebaseConfigured } from '../../firebase/config';
 
 const statusClasses: Record<string, string> = {
   pending: 'bg-orange-100 text-orange-700',
@@ -26,16 +29,53 @@ const PatientConsultationDetail: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const { selected: consultation, loading, error } = useSelector((state: RootState) => state.consultations);
+  const { user } = useSelector((state: RootState) => state.auth);
 
   const [ratingScore, setRatingScore] = useState(5);
   const [ratingComment, setRatingComment] = useState('');
   const [ratingSubmitted, setRatingSubmitted] = useState(false);
   const [ratingError, setRatingError] = useState('');
   const [confirming, setConfirming] = useState(false);
+  const [incomingCall, setIncomingCall] = useState<{
+    roomId: string;
+    from: string;
+    type: CallType;
+  } | null>(null);
+  const seenSignalIdsRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     if (id) dispatch(fetchConsultationById(id));
   }, [id, dispatch]);
+
+  useEffect(() => {
+    if (!consultation || !user?.id || !isFirebaseConfigured) return;
+
+    const roomId = `appt-${consultation.id}`;
+    let unsub: (() => void) | undefined;
+
+    try {
+      unsub = subscribeToSignals(roomId, (signal) => {
+        if (signal.type !== 'ring') return;
+        if (!signal.id || seenSignalIdsRef.current.has(signal.id)) return;
+        if (signal.from === user.id) return;
+        if (signal.to && signal.to !== user.id) return;
+
+        seenSignalIdsRef.current.add(signal.id);
+        const payload = (signal.payload as { roomId?: string; callType?: CallType }) ?? {};
+        setIncomingCall({
+          roomId: payload.roomId ?? roomId,
+          from: signal.from,
+          type: payload.callType === 'audio' ? 'audio' : 'video',
+        });
+      });
+    } catch (_) {
+      // Ignore signal subscription issues; call page will still be available.
+    }
+
+    return () => {
+      unsub?.();
+    };
+  }, [consultation, user?.id]);
 
   const handleConfirm = async () => {
     if (!id) return;
@@ -87,6 +127,31 @@ const PatientConsultationDetail: React.FC = () => {
       </button>
 
       <div className="card mb-4">
+        {incomingCall && (
+          <div className="mb-4 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="m-0 text-sm font-semibold text-blue-800">
+                Incoming {incomingCall.type} call
+              </p>
+              <p className="m-0 text-xs text-blue-700">From: {incomingCall.from}</p>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => navigate(`/call/${incomingCall.roomId}?type=${incomingCall.type}`)}
+                className="px-3 py-1.5 rounded bg-success-500 text-white text-xs font-semibold"
+              >
+                Answer
+              </button>
+              <button
+                onClick={() => setIncomingCall(null)}
+                className="px-3 py-1.5 rounded bg-gray-200 text-gray-700 text-xs font-semibold"
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+        )}
+
         <div className="flex items-center justify-between mb-4">
           <h2 className="m-0 text-xl font-semibold">Consultation Detail</h2>
           <span className={`${badgeClass} px-3 py-1 rounded-full text-xs font-semibold capitalize`}>

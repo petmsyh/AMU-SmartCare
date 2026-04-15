@@ -4,7 +4,6 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { useWebRTC } from '../../hooks/useWebRTC';
 import { CallType } from '../../types/calls';
-import { isFirebaseConfigured } from '../../firebase/config';
 
 // Renders a single video element and attaches the stream imperatively
 const VideoTile: React.FC<{
@@ -65,6 +64,7 @@ const CallScreen: React.FC = () => {
     remoteStreams,
     isMuted,
     isCameraOff,
+    mediaWarning,
     connectionStates,
     toggleMic,
     toggleCamera,
@@ -76,27 +76,6 @@ const CallScreen: React.FC = () => {
     callType,
     onEnded: () => navigate(-1),
   });
-
-  if (!isFirebaseConfigured) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-950 text-white p-8">
-        <div className="max-w-md text-center">
-          <p className="text-4xl mb-4">⚠️</p>
-          <h2 className="text-xl font-bold mb-2">Firebase not configured</h2>
-          <p className="text-gray-400 text-sm">
-            Set the <code className="bg-gray-800 px-1 rounded">REACT_APP_FIREBASE_*</code> env vars
-            and restart the dev server to enable calls.
-          </p>
-          <button
-            onClick={() => navigate(-1)}
-            className="mt-6 px-5 py-2 bg-primary-500 text-white rounded-lg text-sm font-semibold"
-          >
-            Go Back
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   const totalParticipants = remoteStreams.length + 1; // +1 for local
   const gridCols =
@@ -125,6 +104,12 @@ const CallScreen: React.FC = () => {
           <span>👥 {totalParticipants} participant{totalParticipants !== 1 ? 's' : ''}</span>
         </div>
       </div>
+
+      {mediaWarning && (
+        <div className="mx-3 mt-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-amber-800 text-sm">
+          {mediaWarning}
+        </div>
+      )}
 
       {/* Video grid */}
       <div className={`flex-1 grid ${gridCols} gap-2 p-3`}>

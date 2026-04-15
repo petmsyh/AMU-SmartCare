@@ -1,5 +1,5 @@
 import { initializeApp, FirebaseApp } from 'firebase/app';
-import { getFirestore, Firestore } from 'firebase/firestore';
+import { initializeFirestore, Firestore } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -15,7 +15,11 @@ let db: Firestore;
 
 if (firebaseConfig.projectId) {
   app = initializeApp(firebaseConfig);
-  db = getFirestore(app);
+  db = initializeFirestore(app, {
+    // Helps in environments where WebSockets are blocked and Firestore
+    // incorrectly appears offline.
+    experimentalForceLongPolling: true,
+  });
 } else {
   // Firebase not configured – calling features will be unavailable.
   console.warn(

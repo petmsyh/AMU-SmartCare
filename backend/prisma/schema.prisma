@@ -79,6 +79,7 @@ model Consultation {
   messages     Message[]
   ratings      Rating[]
   transactions Transaction[]
+  callRoom     CallRoom?
 }
 
 enum ConsultationStatus {
@@ -167,4 +168,50 @@ enum EscrowState {
   held
   released
   refunded
+}
+
+model CallRoom {
+  id                String      @id
+  consultationId    String      @unique
+  consultation      Consultation @relation(fields: [consultationId], references: [id], onDelete: Cascade)
+  hostUserId        String
+  participantUserIds String[]
+  scheduledFor      DateTime?
+  type              CallType    @default(video)
+  status            CallStatus  @default(scheduled)
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  signals           CallSignal[]
+}
+
+model CallSignal {
+  id          String        @id @default(uuid())
+  roomId      String
+  room        CallRoom      @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  fromUserId  String
+  toUserId    String?
+  type        CallSignalType
+  payload     Json
+  createdAt   DateTime      @default(now())
+}
+
+enum CallType {
+  audio
+  video
+}
+
+enum CallStatus {
+  scheduled
+  ringing
+  in_progress
+  ended
+}
+
+enum CallSignalType {
+  ring
+  offer
+  answer
+  ice
+  hangup
 }

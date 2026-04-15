@@ -1,6 +1,6 @@
-export type CallStatus = 'scheduled' | 'ringing' | 'in-progress' | 'ended';
+export type CallStatus = 'scheduled' | 'ringing' | 'in_progress' | 'ended';
 export type CallType = 'audio' | 'video';
-export type SignalType = 'offer' | 'answer' | 'ice' | 'hangup';
+export type SignalType = 'ring' | 'offer' | 'answer' | 'ice' | 'hangup';
 
 export interface CallRoom {
   id: string;

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { CallRoom, CallSignal, CallType } from '../types/calls';
 import {
+  getOrCreateCallRoom,
   sendSignal,
   subscribeToSignals,
   subscribeToRoom,
@@ -29,6 +30,7 @@ export interface UseWebRTCReturn {
   remoteStreams: RemoteStream[];
   isMuted: boolean;
   isCameraOff: boolean;
+  mediaWarning: string;
   connectionStates: Record<string, RTCPeerConnectionState>;
   toggleMic: () => void;
   toggleCamera: () => void;
@@ -46,6 +48,7 @@ export function useWebRTC({
   const [remoteStreams, setRemoteStreams] = useState<RemoteStream[]>([]);
   const [isMuted, setIsMuted] = useState(false);
   const [isCameraOff, setIsCameraOff] = useState(false);
+  const [mediaWarning, setMediaWarning] = useState('');
   const [room, setRoom] = useState<CallRoom | null>(null);
   const [connectionStates, setConnectionStates] = useState<
     Record<string, RTCPeerConnectionState>
@@ -111,6 +114,31 @@ export function useWebRTC({
     },
     [roomId, userId, updateConnectionState]
   );
+
+  const acquireMediaStream = useCallback(async (): Promise<MediaStream> => {
+    const preferredConstraints: MediaStreamConstraints = {
+      audio: true,
+      video: callType === 'video',
+    };
+
+    try {
+      return await navigator.mediaDevices.getUserMedia(preferredConstraints);
+    } catch (error) {
+      if (!(error instanceof DOMException) || error.name !== 'NotFoundError') {
+        throw error;
+      }
+
+      // If the requested device is missing, fall back to a receive-only style
+      // stream so the call screen can still open instead of failing hard.
+      if (callType === 'audio') {
+        setMediaWarning('No microphone was found. Joining without local audio.');
+        return new MediaStream();
+      }
+
+      setMediaWarning('No camera was found. Joining with audio only.');
+      return navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+    }
+  }, [callType]);
 
   // ── initiate offer to a new peer ─────────────────────────────────────────
 
@@ -200,12 +228,18 @@ export function useWebRTC({
 
     const init = async () => {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          audio: true,
-          video: callType === 'video',
-        });
+        const stream = await acquireMediaStream();
         localStreamRef.current = stream;
         setLocalStream(stream);
+
+        const consultationId = roomId.startsWith('appt-') ? roomId.slice(5) : roomId;
+        await getOrCreateCallRoom(
+          consultationId,
+          userId,
+          [],
+          new Date().toISOString(),
+          callType
+        );
 
         unsubRoom = subscribeToRoom(roomId, (r) => {
           setRoom(r);
@@ -217,21 +251,15 @@ export function useWebRTC({
         unsubSignals = subscribeToSignals(roomId, handleSignal);
 
         // Update room status to in-progress when we join
-        await updateRoomStatus(roomId, 'in-progress');
+        await updateRoomStatus(roomId, 'in_progress');
 
-        // If other participants are already in the room, send them offers
-        // We rely on the room snapshot for the participant list; a small delay
-        // lets the snapshot arrive first.
-        setTimeout(async () => {
-          if (!room) return;
-          for (const pid of room.participantUserIds) {
-            if (pid !== userId && !pcsRef.current.has(pid)) {
-              await initiateOffer(pid);
-            }
-          }
-        }, 1500);
       } catch (err) {
         console.error('useWebRTC init error:', err);
+        setMediaWarning(
+          err instanceof Error
+            ? err.message
+            : 'Failed to access microphone or camera.'
+        );
       }
     };
 
@@ -307,6 +335,7 @@ export function useWebRTC({
     isMuted,
     isCameraOff,
     connectionStates,
+    mediaWarning,
     toggleMic,
     toggleCamera,
     hangUp,
