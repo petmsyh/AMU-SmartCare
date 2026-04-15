@@ -2,6 +2,9 @@ FROM node:18-bookworm-slim AS builder
 
 WORKDIR /app
 
+RUN apt-get update && apt-get install -y --no-install-recommends openssl \
+	&& rm -rf /var/lib/apt/lists/*
+
 COPY package*.json ./
 RUN npm ci
 
@@ -16,12 +19,15 @@ FROM node:18-bookworm-slim AS runner
 
 WORKDIR /app
 
+RUN apt-get update && apt-get install -y --no-install-recommends openssl \
+	&& rm -rf /var/lib/apt/lists/*
+
 COPY package*.json ./
 RUN npm ci --omit=dev
 
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY prisma ./prisma
+RUN npx prisma generate
 
 EXPOSE 5000
 
