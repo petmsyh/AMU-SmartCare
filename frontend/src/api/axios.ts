@@ -1,7 +1,16 @@
 import axios from 'axios';
 
+const configuredApiUrl = process.env.REACT_APP_API_URL?.trim();
+const normalizedApiUrl = configuredApiUrl
+  ? configuredApiUrl.replace(/\/+$/, '')
+  : '';
+
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000/api',
+  baseURL: normalizedApiUrl
+    ? normalizedApiUrl.endsWith('/api')
+      ? normalizedApiUrl
+      : `${normalizedApiUrl}/api`
+    : 'http://localhost:5000/api',
 });
 
 api.interceptors.request.use((config) => {
