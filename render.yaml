@@ -1,0 +1,11 @@
+services:
+  - type: static_site
+    name: amu-smartcare-2
+    branch: main
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    staticPublishPath: build
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
