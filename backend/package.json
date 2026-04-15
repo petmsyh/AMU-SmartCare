@@ -8,8 +8,10 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "db:migrate": "prisma migrate dev",
+    "db:migrate:deploy": "prisma migrate deploy",
     "db:generate": "prisma generate",
-    "db:seed": "ts-node --project prisma/tsconfig.json prisma/seed.ts",
+    "db:seed": "node prisma/seed.js",
+    "db:setup": "npm run db:migrate:deploy && npm run db:seed",
     "lint": "eslint src --ext .ts",
     "test": "jest"
   },
