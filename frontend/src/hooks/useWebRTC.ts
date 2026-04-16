@@ -8,10 +8,49 @@ import {
   updateRoomStatus,
 } from '../firebase/callService';
 
-// Default public STUN server (dev-only; add TURN for production)
-const ICE_CONFIG: RTCConfiguration = {
-  iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
-};
+function parseCsv(value: string | undefined): string[] {
+  if (!value) return [];
+  return value
+    .split(',')
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+}
+
+function buildIceConfig(): RTCConfiguration {
+  const stunUrls = parseCsv(process.env.REACT_APP_STUN_URLS);
+  const turnUrls = parseCsv(process.env.REACT_APP_TURN_URLS);
+  const turnUsername = process.env.REACT_APP_TURN_USERNAME?.trim();
+  const turnCredential = process.env.REACT_APP_TURN_CREDENTIAL?.trim();
+
+  const iceServers: RTCIceServer[] = [];
+
+  if (stunUrls.length > 0) {
+    iceServers.push({ urls: stunUrls });
+  } else {
+    // Safe fallback for development.
+    iceServers.push({ urls: ['stun:stun.l.google.com:19302'] });
+  }
+
+  if (turnUrls.length > 0) {
+    if (turnUsername && turnCredential) {
+      iceServers.push({
+        urls: turnUrls,
+        username: turnUsername,
+        credential: turnCredential,
+      });
+    } else {
+      // Some TURN providers support anonymous relay.
+      iceServers.push({ urls: turnUrls });
+    }
+  }
+
+  return {
+    iceServers,
+    iceCandidatePoolSize: 10,
+  };
+}
+
+const ICE_CONFIG: RTCConfiguration = buildIceConfig();
 
 const MAX_SIGNAL_AGE_MS = 2 * 60 * 1000;
 
@@ -59,6 +98,8 @@ export function useWebRTC({
   // Map from remoteUserId -> RTCPeerConnection
   const pcsRef = useRef<Map<string, RTCPeerConnection>>(new Map());
   const localStreamRef = useRef<MediaStream | null>(null);
+  // Map from remoteUserId -> ICE candidates received before remote description is ready
+  const pendingIceRef = useRef<Map<string, RTCIceCandidateInit[]>>(new Map());
   // Track which offers we've already processed
   const processedSignalsRef = useRef<Set<string>>(new Set());
   const hungUpRef = useRef(false);
@@ -160,6 +201,28 @@ export function useWebRTC({
     [createPeerConnection, roomId, userId]
   );
 
+  const queueIceCandidate = useCallback((peerId: string, candidate: RTCIceCandidateInit) => {
+    const current = pendingIceRef.current.get(peerId) ?? [];
+    current.push(candidate);
+    pendingIceRef.current.set(peerId, current);
+  }, []);
+
+  const flushPendingIceCandidates = useCallback(async (peerId: string, pc: RTCPeerConnection) => {
+    const pending = pendingIceRef.current.get(peerId);
+    if (!pending || pending.length === 0) return;
+    if (!pc.remoteDescription) return;
+
+    for (const candidate of pending) {
+      try {
+        await pc.addIceCandidate(new RTCIceCandidate(candidate));
+      } catch (_) {
+        // Ignore invalid/stale candidates.
+      }
+    }
+
+    pendingIceRef.current.delete(peerId);
+  }, []);
+
   // ── handle incoming signal ───────────────────────────────────────────────
 
   const handleSignal = useCallback(
@@ -199,6 +262,7 @@ export function useWebRTC({
       if (signal.type === 'offer') {
         if (!pc) pc = createPeerConnection(signal.from);
         await pc.setRemoteDescription(new RTCSessionDescription(signal.payload));
+        await flushPendingIceCandidates(signal.from, pc);
         const answer = await pc.createAnswer();
         await pc.setLocalDescription(answer);
         await sendSignal(roomId, {
@@ -211,18 +275,26 @@ export function useWebRTC({
       } else if (signal.type === 'answer') {
         if (pc && pc.signalingState !== 'stable') {
           await pc.setRemoteDescription(new RTCSessionDescription(signal.payload));
+          await flushPendingIceCandidates(signal.from, pc);
         }
       } else if (signal.type === 'ice') {
+        const candidateInit = signal.payload as RTCIceCandidateInit;
         if (pc) {
-          try {
-            await pc.addIceCandidate(new RTCIceCandidate(signal.payload));
-          } catch (_) {
-            // Ignore stale ICE candidates
+          if (pc.remoteDescription) {
+            try {
+              await pc.addIceCandidate(new RTCIceCandidate(candidateInit));
+            } catch (_) {
+              // Ignore stale ICE candidates
+            }
+          } else {
+            queueIceCandidate(signal.from, candidateInit);
           }
+        } else {
+          queueIceCandidate(signal.from, candidateInit);
         }
       }
     },
-    [userId, roomId, createPeerConnection]
+    [userId, roomId, createPeerConnection, flushPendingIceCandidates, queueIceCandidate]
   );
 
   // ── main effect: acquire media, subscribe to room + signals ───────────────
