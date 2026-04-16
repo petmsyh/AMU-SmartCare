@@ -203,7 +203,9 @@ export function subscribeToRoom(
   let disposed = false;
   let lastSignature = '';
   let nextRoomLookupAt = 0;
-  const shouldPollBackend = !readLocalRoom(roomId);
+  // Local storage is only an optimistic cache; backend polling must stay on so
+  // different browsers/devices can observe the same room state.
+  const shouldPollBackend = true;
 
   const initialRoom = readLocalRoom(roomId);
   if (initialRoom) {
@@ -298,9 +300,7 @@ export function subscribeToSignals(
 ): () => void {
   let disposed = false;
   const seenIds = new Set<string>();
-  const hasLocalRoom = Boolean(readLocalRoom(roomId));
-  const shouldPollBackend = !hasLocalRoom;
-  let backendRoomKnown = hasLocalRoom;
+  let backendRoomKnown = false;
   let nextRoomLookupAt = 0;
 
   const emitSignal = (signal: CallSignal) => {
@@ -328,7 +328,6 @@ export function subscribeToSignals(
 
   const poll = async () => {
     if (disposed) return;
-    if (!shouldPollBackend) return;
     const now = Date.now();
     if (now < nextRoomLookupAt) return;
     try {

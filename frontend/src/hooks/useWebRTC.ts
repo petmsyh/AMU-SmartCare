@@ -282,6 +282,8 @@ export function useWebRTC({
   // Send offers when room participant list changes
   useEffect(() => {
     if (!room) return;
+    if (room.hostUserId !== userId) return;
+
     room.participantUserIds.forEach(async (pid) => {
       if (pid !== userId && !pcsRef.current.has(pid)) {
         await initiateOffer(pid);

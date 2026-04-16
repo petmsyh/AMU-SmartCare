@@ -12,7 +12,6 @@ import RatingStars from '../../components/RatingStars';
 import JoinCallButton from '../../components/JoinCallButton';
 import { subscribeToSignals } from '../../firebase/callService';
 import { CallType } from '../../types/calls';
-import { isFirebaseConfigured } from '../../firebase/config';
 
 const MAX_RING_SIGNAL_AGE_MS = 45 * 1000;
 
@@ -57,7 +56,7 @@ const PatientConsultationDetail: React.FC = () => {
   }, [id, dispatch]);
 
   useEffect(() => {
-    if (!consultation || !user?.id || !isFirebaseConfigured) return;
+    if (!consultation || !user?.id) return;
 
     const roomId = `appt-${consultation.id}`;
     let unsub: (() => void) | undefined;
