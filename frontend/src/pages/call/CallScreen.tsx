@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
@@ -77,13 +77,113 @@ const CallScreen: React.FC = () => {
     onEnded: () => navigate(-1),
   });
 
-  const totalParticipants = remoteStreams.length + 1; // +1 for local
-  const gridCols =
-    totalParticipants <= 1
-      ? 'grid-cols-1'
-      : totalParticipants <= 4
-      ? 'grid-cols-2'
-      : 'grid-cols-3';
+  const totalParticipants = remoteStreams.length + 1;
+  const primaryRemote = remoteStreams[0];
+  const primaryRemoteState = primaryRemote ? connectionStates[primaryRemote.userId] : undefined;
+  const hasConnectedRemote = remoteStreams.some(
+    ({ userId: pid }) => connectionStates[pid] === 'connected'
+  );
+
+  const stageRef = useRef<HTMLDivElement>(null);
+  const pipRef = useRef<HTMLDivElement>(null);
+  const [pipPosition, setPipPosition] = useState<{ x: number; y: number } | null>(null);
+  const dragStateRef = useRef<{
+    pointerId: number;
+    offsetX: number;
+    offsetY: number;
+  } | null>(null);
+
+  useEffect(() => {
+    if (!localStream || !primaryRemote || callType !== 'video') {
+      setPipPosition(null);
+      return;
+    }
+
+    if (pipPosition) return;
+
+    const stageEl = stageRef.current;
+    const pipEl = pipRef.current;
+    if (!stageEl || !pipEl) return;
+
+    const stageRect = stageEl.getBoundingClientRect();
+    const pipRect = pipEl.getBoundingClientRect();
+    const margin = 12;
+
+    setPipPosition({
+      x: Math.max(margin, stageRect.width - pipRect.width - margin),
+      y: Math.max(margin, stageRect.height - pipRect.height - margin),
+    });
+  }, [localStream, primaryRemote, callType, pipPosition]);
+
+  useEffect(() => {
+    const handlePointerMove = (event: PointerEvent) => {
+      const drag = dragStateRef.current;
+      const stageEl = stageRef.current;
+      const pipEl = pipRef.current;
+      if (!drag || !stageEl || !pipEl) return;
+      if (event.pointerId !== drag.pointerId) return;
+
+      const stageRect = stageEl.getBoundingClientRect();
+      const pipRect = pipEl.getBoundingClientRect();
+      const margin = 12;
+
+      const maxX = Math.max(margin, stageRect.width - pipRect.width - margin);
+      const maxY = Math.max(margin, stageRect.height - pipRect.height - margin);
+
+      const rawX = event.clientX - stageRect.left - drag.offsetX;
+      const rawY = event.clientY - stageRect.top - drag.offsetY;
+
+      const x = Math.min(maxX, Math.max(margin, rawX));
+      const y = Math.min(maxY, Math.max(margin, rawY));
+
+      setPipPosition({ x, y });
+    };
+
+    const handlePointerUp = (event: PointerEvent) => {
+      const drag = dragStateRef.current;
+      if (!drag) return;
+      if (event.pointerId !== drag.pointerId) return;
+      dragStateRef.current = null;
+    };
+
+    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointerup', handlePointerUp);
+    window.addEventListener('pointercancel', handlePointerUp);
+
+    return () => {
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', handlePointerUp);
+      window.removeEventListener('pointercancel', handlePointerUp);
+    };
+  }, []);
+
+  const handlePipPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    const stageEl = stageRef.current;
+    const pipEl = pipRef.current;
+    if (!stageEl || !pipEl) return;
+
+    const stageRect = stageEl.getBoundingClientRect();
+    const pipRect = pipEl.getBoundingClientRect();
+
+    dragStateRef.current = {
+      pointerId: event.pointerId,
+      offsetX: event.clientX - pipRect.left,
+      offsetY: event.clientY - pipRect.top,
+    };
+
+    const margin = 12;
+    const maxX = Math.max(margin, stageRect.width - pipRect.width - margin);
+    const maxY = Math.max(margin, stageRect.height - pipRect.height - margin);
+    const rawX = event.clientX - stageRect.left - dragStateRef.current.offsetX;
+    const rawY = event.clientY - stageRect.top - dragStateRef.current.offsetY;
+
+    setPipPosition({
+      x: Math.min(maxX, Math.max(margin, rawX)),
+      y: Math.min(maxY, Math.max(margin, rawY)),
+    });
+
+    pipEl.setPointerCapture(event.pointerId);
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-950 text-white">
@@ -111,34 +211,80 @@ const CallScreen: React.FC = () => {
         </div>
       )}
 
-      {/* Video grid */}
-      <div className={`flex-1 grid ${gridCols} gap-2 p-3`}>
-        {/* Local stream */}
-        <VideoTile
-          stream={localStream}
-          muted
-          label={`${user?.username ?? 'You'} (You)`}
-          className={callType === 'audio' ? 'flex items-center justify-center' : 'aspect-video'}
-        />
-        {/* Remote streams */}
-        {remoteStreams.map(({ userId: pid, stream }) => (
-          <div key={pid} className="relative">
-            <VideoTile
-              stream={stream}
-              label={pid}
-              className={callType === 'audio' ? 'flex items-center justify-center' : 'aspect-video'}
-            />
-            {/* Connection state indicator */}
-            <div className="absolute top-2 right-2 flex items-center gap-1 bg-black/50 px-2 py-0.5 rounded-full text-xs">
-              <ConnectionDot state={connectionStates[pid]} />
-              <span>{connectionStates[pid] ?? 'connecting'}</span>
+      {/* Video stage */}
+      <div className="relative flex-1 p-3" ref={stageRef}>
+        {callType === 'video' ? (
+          <div className="relative w-full h-full rounded-2xl overflow-hidden bg-gray-900 border border-gray-800">
+            {primaryRemote ? (
+              <>
+                <VideoTile
+                  stream={primaryRemote.stream}
+                  label={primaryRemote.userId}
+                  className="w-full h-full rounded-none"
+                />
+                <div className="absolute top-3 right-3 flex items-center gap-1 bg-black/60 px-2 py-1 rounded-full text-xs">
+                  <ConnectionDot state={primaryRemoteState} />
+                  <span>{primaryRemoteState ?? 'connecting'}</span>
+                </div>
+              </>
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-gradient-to-b from-gray-900 to-gray-950">
+                <div className="text-center text-gray-300">
+                  <div className="text-4xl mb-2">📹</div>
+                  <p className="text-sm">Waiting for the other person to connect...</p>
+                </div>
+              </div>
+            )}
+
+            {/* Local PiP preview after remote is connected */}
+            {localStream && primaryRemote && (
+              <div
+                ref={pipRef}
+                onPointerDown={handlePipPointerDown}
+                className="absolute w-28 h-40 sm:w-36 sm:h-52 rounded-xl overflow-hidden shadow-2xl border border-white/20 bg-gray-900 cursor-grab active:cursor-grabbing touch-none"
+                style={
+                  pipPosition
+                    ? { left: `${pipPosition.x}px`, top: `${pipPosition.y}px` }
+                    : { right: '12px', bottom: '12px' }
+                }
+              >
+                <VideoTile
+                  stream={localStream}
+                  muted
+                  label={`${user?.username ?? 'You'} (You)`}
+                  className="w-full h-full rounded-none"
+                />
+              </div>
+            )}
+
+            {/* Before connection, show local video in full area so user can preview camera */}
+            {localStream && !primaryRemote && (
+              <VideoTile
+                stream={localStream}
+                muted
+                label={`${user?.username ?? 'You'} (You)`}
+                className="absolute inset-0 w-full h-full rounded-none"
+              />
+            )}
+          </div>
+        ) : (
+          <div className="w-full h-full rounded-2xl bg-gray-900 border border-gray-800 flex flex-col items-center justify-center gap-4">
+            <div className="w-28 h-28 rounded-full bg-blue-500/80 flex items-center justify-center text-5xl shadow-lg">
+              {primaryRemote?.userId?.[0]?.toUpperCase() ?? '?'}
+            </div>
+            <div className="text-sm text-gray-300">
+              {primaryRemote ? primaryRemote.userId : 'Connecting...'}
+            </div>
+            <div className="flex items-center gap-1 bg-black/50 px-2 py-1 rounded-full text-xs">
+              <ConnectionDot state={primaryRemoteState} />
+              <span>{primaryRemoteState ?? 'connecting'}</span>
             </div>
           </div>
-        ))}
+        )}
       </div>
 
       {/* Audio-only avatars when camera is off or audio call */}
-      {(callType === 'audio' || isCameraOff) && localStream && (
+      {(callType === 'audio' || (isCameraOff && hasConnectedRemote)) && localStream && (
         <div className="flex justify-center py-4">
           <div className="w-24 h-24 rounded-full bg-primary-500 flex items-center justify-center text-4xl shadow-lg">
             {user?.username?.[0]?.toUpperCase() ?? '?'}
