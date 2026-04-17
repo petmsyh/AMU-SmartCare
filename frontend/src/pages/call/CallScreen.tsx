@@ -83,6 +83,7 @@ const CallScreen: React.FC = () => {
   const hasConnectedRemote = remoteStreams.some(
     ({ userId: pid }) => connectionStates[pid] === 'connected'
   );
+  const [isSwapped, setIsSwapped] = useState(false);
 
   const stageRef = useRef<HTMLDivElement>(null);
   const pipRef = useRef<HTMLDivElement>(null);
@@ -91,7 +92,22 @@ const CallScreen: React.FC = () => {
     pointerId: number;
     offsetX: number;
     offsetY: number;
+    startX: number;
+    startY: number;
+    moved: boolean;
   } | null>(null);
+  const lastTapAtRef = useRef(0);
+  const canSwapRef = useRef(false);
+
+  useEffect(() => {
+    canSwapRef.current = Boolean(callType === 'video' && localStream && primaryRemote);
+  }, [callType, localStream, primaryRemote]);
+
+  useEffect(() => {
+    if (!localStream || !primaryRemote || callType !== 'video') {
+      setIsSwapped(false);
+    }
+  }, [localStream, primaryRemote, callType]);
 
   useEffect(() => {
     if (!localStream || !primaryRemote || callType !== 'video') {
@@ -123,6 +139,13 @@ const CallScreen: React.FC = () => {
       if (!drag || !stageEl || !pipEl) return;
       if (event.pointerId !== drag.pointerId) return;
 
+      if (
+        Math.abs(event.clientX - drag.startX) > 6 ||
+        Math.abs(event.clientY - drag.startY) > 6
+      ) {
+        drag.moved = true;
+      }
+
       const stageRect = stageEl.getBoundingClientRect();
       const pipRect = pipEl.getBoundingClientRect();
       const margin = 12;
@@ -143,6 +166,17 @@ const CallScreen: React.FC = () => {
       const drag = dragStateRef.current;
       if (!drag) return;
       if (event.pointerId !== drag.pointerId) return;
+
+      if (!drag.moved && canSwapRef.current) {
+        const now = Date.now();
+        if (now - lastTapAtRef.current < 280) {
+          setIsSwapped((prev) => !prev);
+          lastTapAtRef.current = 0;
+        } else {
+          lastTapAtRef.current = now;
+        }
+      }
+
       dragStateRef.current = null;
     };
 
@@ -169,6 +203,9 @@ const CallScreen: React.FC = () => {
       pointerId: event.pointerId,
       offsetX: event.clientX - pipRect.left,
       offsetY: event.clientY - pipRect.top,
+      startX: event.clientX,
+      startY: event.clientY,
+      moved: false,
     };
 
     const margin = 12;
@@ -217,15 +254,26 @@ const CallScreen: React.FC = () => {
           <div className="relative w-full h-full rounded-2xl overflow-hidden bg-gray-900 border border-gray-800">
             {primaryRemote ? (
               <>
-                <VideoTile
-                  stream={primaryRemote.stream}
-                  label={primaryRemote.userId}
-                  className="w-full h-full rounded-none"
-                />
-                <div className="absolute top-3 right-3 flex items-center gap-1 bg-black/60 px-2 py-1 rounded-full text-xs">
-                  <ConnectionDot state={primaryRemoteState} />
-                  <span>{primaryRemoteState ?? 'connecting'}</span>
-                </div>
+                {isSwapped && localStream ? (
+                  <VideoTile
+                    stream={localStream}
+                    muted
+                    label={`${user?.username ?? 'You'} (You)`}
+                    className="w-full h-full rounded-none"
+                  />
+                ) : (
+                  <>
+                    <VideoTile
+                      stream={primaryRemote.stream}
+                      label={primaryRemote.userId}
+                      className="w-full h-full rounded-none"
+                    />
+                    <div className="absolute top-3 right-3 flex items-center gap-1 bg-black/60 px-2 py-1 rounded-full text-xs">
+                      <ConnectionDot state={primaryRemoteState} />
+                      <span>{primaryRemoteState ?? 'connecting'}</span>
+                    </div>
+                  </>
+                )}
               </>
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-gradient-to-b from-gray-900 to-gray-950">
@@ -249,9 +297,9 @@ const CallScreen: React.FC = () => {
                 }
               >
                 <VideoTile
-                  stream={localStream}
-                  muted
-                  label={`${user?.username ?? 'You'} (You)`}
+                  stream={isSwapped ? primaryRemote.stream : localStream}
+                  muted={!isSwapped}
+                  label={isSwapped ? primaryRemote.userId : `${user?.username ?? 'You'} (You)`}
                   className="w-full h-full rounded-none"
                 />
               </div>
