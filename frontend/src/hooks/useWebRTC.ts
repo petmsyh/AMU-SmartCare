@@ -430,6 +430,9 @@ export function useWebRTC({
       createdAt: new Date().toISOString(),
     }).catch(() => {});
 
+    // Prevent stale ring/signaling replay when re-opening the same room.
+    clearLocalCallSignalCache(roomId);
+
     // Close all peer connections
     pcsRef.current.forEach((pc) => pc.close());
     pcsRef.current.clear();

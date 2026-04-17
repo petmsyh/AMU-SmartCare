@@ -321,10 +321,23 @@ export function subscribeToSignals(
   const seenIds = new Set<string>();
   let backendRoomKnown = false;
   let nextRoomLookupAt = 0;
+  const subscriptionStartedAtMs = Date.now();
+  const bootstrapWindowMs = 5000;
+  let lastSeenCreatedAt = new Date(subscriptionStartedAtMs - bootstrapWindowMs).toISOString();
+
+  const isRelevantForCurrentSubscription = (signal: CallSignal): boolean => {
+    const createdAtMs = Date.parse(signal.createdAt ?? '');
+    if (Number.isNaN(createdAtMs)) return true;
+    return createdAtMs >= subscriptionStartedAtMs - bootstrapWindowMs;
+  };
 
   const emitSignal = (signal: CallSignal) => {
     if (!signal.id || seenIds.has(signal.id)) return;
+    if (!isRelevantForCurrentSubscription(signal)) return;
     seenIds.add(signal.id);
+    if ((signal.createdAt || '') > lastSeenCreatedAt) {
+      lastSeenCreatedAt = signal.createdAt;
+    }
     onSignal(signal);
   };
 
@@ -361,9 +374,11 @@ export function subscribeToSignals(
         nextRoomLookupAt = 0;
       }
 
-      const response = await api.get<ApiEnvelope<Record<string, unknown>[]>>(
-        `/calls/rooms/${roomId}/signals`
-      );
+      const response = await api.get<ApiEnvelope<Record<string, unknown>[]>>(`/calls/rooms/${roomId}/signals`, {
+        params: {
+          after: lastSeenCreatedAt,
+        },
+      });
       const signals = normalizeSignalResponse(response.data);
       for (const signal of signals) {
         emitSignal(signal);
