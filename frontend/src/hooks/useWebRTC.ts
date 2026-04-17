@@ -386,19 +386,15 @@ export function useWebRTC({
 
     init();
 
-    const pcs = pcsRef.current;
-    const pendingIce = pendingIceRef.current;
-    const processedSignals = processedSignalsRef.current;
-
     return () => {
       unsubRoom?.();
       unsubSignals?.();
 
       // Ensure resources are released even when user leaves without pressing hang up.
-      pcs.forEach((pc) => pc.close());
-      pcs.clear();
-      pendingIce.clear();
-      processedSignals.clear();
+      pcsRef.current.forEach((pc) => pc.close());
+      pcsRef.current.clear();
+      pendingIceRef.current.clear();
+      processedSignalsRef.current.clear();
       localStreamRef.current?.getTracks().forEach((track) => track.stop());
       localStreamRef.current = null;
     };
