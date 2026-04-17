@@ -63,6 +63,10 @@ function localSignalKey(roomId: string, signalId: string): string {
   return `${LOCAL_SIGNAL_PREFIX}${roomId}:${signalId}`;
 }
 
+function isSignalStorageKeyForRoom(key: string, roomId: string): boolean {
+  return key.startsWith(`${LOCAL_SIGNAL_PREFIX}${roomId}:`);
+}
+
 function getBroadcastChannel(roomId: string): BroadcastChannel | null {
   if (typeof window === 'undefined' || typeof BroadcastChannel === 'undefined') return null;
   return new BroadcastChannel(`${LOCAL_CHANNEL_PREFIX}${roomId}`);
@@ -98,12 +102,27 @@ function getLocalSignals(roomId: string): CallSignal[] {
   const signals: CallSignal[] = [];
   for (let index = 0; index < window.localStorage.length; index += 1) {
     const key = window.localStorage.key(index);
-    if (!key || !key.startsWith(`${LOCAL_SIGNAL_PREFIX}${roomId}:`)) continue;
+    if (!key || !isSignalStorageKeyForRoom(key, roomId)) continue;
     const signal = safeJsonParse<CallSignal>(window.localStorage.getItem(key));
     if (signal) signals.push(signal);
   }
   signals.sort((left, right) => (left.createdAt || '').localeCompare(right.createdAt || ''));
   return signals;
+}
+
+export function clearLocalCallSignalCache(roomId: string): void {
+  if (!canUseBrowserStorage()) return;
+
+  const keysToDelete: string[] = [];
+  for (let index = 0; index < window.localStorage.length; index += 1) {
+    const key = window.localStorage.key(index);
+    if (!key || !isSignalStorageKeyForRoom(key, roomId)) continue;
+    keysToDelete.push(key);
+  }
+
+  keysToDelete.forEach((key) => {
+    window.localStorage.removeItem(key);
+  });
 }
 
 function createSignalId(): string {
@@ -320,7 +339,7 @@ export function subscribeToSignals(
   localChannel?.addEventListener('message', handleLocalMessage);
 
   const handleStorage = (event: StorageEvent) => {
-    if (!event.key || !event.key.startsWith(`${LOCAL_SIGNAL_PREFIX}${roomId}:`) || !event.newValue) return;
+    if (!event.key || !isSignalStorageKeyForRoom(event.key, roomId) || !event.newValue) return;
     const signal = safeJsonParse<CallSignal>(event.newValue);
     if (signal) emitSignal(signal);
   };

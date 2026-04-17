@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { CallRoom, CallSignal, CallType } from '../types/calls';
 import {
+  clearLocalCallSignalCache,
   getOrCreateCallRoom,
   sendSignal,
   subscribeToSignals,
@@ -103,6 +104,7 @@ export function useWebRTC({
   // Track which offers we've already processed
   const processedSignalsRef = useRef<Set<string>>(new Set());
   const hungUpRef = useRef(false);
+  const sessionStartedAtRef = useRef<number>(0);
 
   // ── helpers ─────────────────────────────────────────────────────────────
 
@@ -236,6 +238,16 @@ export function useWebRTC({
       if (processedSignalsRef.current.has(signal.id)) return;
       processedSignalsRef.current.add(signal.id);
 
+      // Ignore stale hangup events from a previous call attempt in the same room.
+      if (
+        signal.type === 'hangup' &&
+        !Number.isNaN(createdAtMs) &&
+        sessionStartedAtRef.current > 0 &&
+        createdAtMs < sessionStartedAtRef.current
+      ) {
+        return;
+      }
+
       // Ignore signals not targeted at this user (except broadcasts with no `to`)
       if (signal.to && signal.to !== userId) return;
       // Ignore signals from self
@@ -307,6 +319,16 @@ export function useWebRTC({
 
     const init = async () => {
       try {
+        hungUpRef.current = false;
+        sessionStartedAtRef.current = Date.now();
+        processedSignalsRef.current.clear();
+        pendingIceRef.current.clear();
+        setRemoteStreams([]);
+        setConnectionStates({});
+
+        // Drop stale local signals from previous call sessions for this room.
+        clearLocalCallSignalCache(roomId);
+
         const stream = await acquireMediaStream();
         localStreamRef.current = stream;
         setLocalStream(stream);
@@ -344,9 +366,21 @@ export function useWebRTC({
 
     init();
 
+    const pcs = pcsRef.current;
+    const pendingIce = pendingIceRef.current;
+    const processedSignals = processedSignalsRef.current;
+
     return () => {
       unsubRoom?.();
       unsubSignals?.();
+
+      // Ensure resources are released even when user leaves without pressing hang up.
+      pcs.forEach((pc) => pc.close());
+      pcs.clear();
+      pendingIce.clear();
+      processedSignals.clear();
+      localStreamRef.current?.getTracks().forEach((track) => track.stop());
+      localStreamRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomId, userId, callType]);

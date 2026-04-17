@@ -151,6 +151,10 @@ npm start
 | Variable | Default | Description |
 |---|---|---|
 | `REACT_APP_API_URL` | `http://localhost:5000/api` | Backend API base URL |
+| `REACT_APP_STUN_URLS` | `stun:stun.l.google.com:19302` | Comma-separated STUN server URLs |
+| `REACT_APP_TURN_URLS` | *(optional)* | Comma-separated TURN server URLs (recommended for production/mobile networks) |
+| `REACT_APP_TURN_USERNAME` | *(optional)* | TURN username |
+| `REACT_APP_TURN_CREDENTIAL` | *(optional)* | TURN credential/password |
 
 ---
 
