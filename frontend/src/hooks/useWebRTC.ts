@@ -133,6 +133,14 @@ export function useWebRTC({
 
       pc.onconnectionstatechange = () => {
         updateConnectionState(peerId, pc.connectionState);
+
+        // If a peer connection gets stuck/failed, remove it so a fresh
+        // negotiation can be created on the next offer cycle.
+        if (pc.connectionState === 'failed' || pc.connectionState === 'closed') {
+          pcsRef.current.delete(peerId);
+          pendingIceRef.current.delete(peerId);
+          setRemoteStreams((prev) => prev.filter((r) => r.userId !== peerId));
+        }
       };
 
       pc.ontrack = (event) => {
@@ -272,6 +280,18 @@ export function useWebRTC({
       let pc = pcsRef.current.get(signal.from);
 
       if (signal.type === 'offer') {
+        if (
+          pc &&
+          (pc.connectionState === 'failed' ||
+            pc.connectionState === 'closed' ||
+            pc.signalingState !== 'stable')
+        ) {
+          pc.close();
+          pcsRef.current.delete(signal.from);
+          pendingIceRef.current.delete(signal.from);
+          pc = undefined;
+        }
+
         if (!pc) pc = createPeerConnection(signal.from);
         await pc.setRemoteDescription(new RTCSessionDescription(signal.payload));
         await flushPendingIceCandidates(signal.from, pc);
@@ -391,12 +411,26 @@ export function useWebRTC({
     if (room.hostUserId !== userId) return;
 
     room.participantUserIds.forEach(async (pid) => {
-      if (pid !== userId && !pcsRef.current.has(pid)) {
+      if (pid === userId) return;
+
+      const existingPc = pcsRef.current.get(pid);
+      const shouldCreateOffer =
+        !existingPc ||
+        existingPc.connectionState === 'failed' ||
+        existingPc.connectionState === 'closed' ||
+        existingPc.connectionState === 'disconnected';
+
+      if (shouldCreateOffer) {
+        if (existingPc) {
+          existingPc.close();
+          pcsRef.current.delete(pid);
+          pendingIceRef.current.delete(pid);
+        }
         await initiateOffer(pid);
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [room?.participantUserIds.join(',')]);
+  }, [room?.participantUserIds.join(','), room?.status]);
 
   // ── controls ─────────────────────────────────────────────────────────────
 
