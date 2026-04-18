@@ -22,7 +22,7 @@ interface JoinCallButtonProps {
 const LoadingIcon: React.FC = () => (
   <svg
     viewBox="0 0 24 24"
-    className="w-5 h-5 animate-spin"
+    className="w-4 h-4 animate-spin"
     fill="none"
     stroke="currentColor"
     strokeWidth="2"
@@ -37,7 +37,7 @@ const LoadingIcon: React.FC = () => (
 const AudioIcon: React.FC = () => (
   <svg
     viewBox="0 0 24 24"
-    className="w-5 h-5"
+    className="w-4 h-4"
     fill="none"
     stroke="currentColor"
     strokeWidth="2"
@@ -54,7 +54,7 @@ const AudioIcon: React.FC = () => (
 const VideoIcon: React.FC = () => (
   <svg
     viewBox="0 0 24 24"
-    className="w-5 h-5"
+    className="w-4 h-4"
     fill="none"
     stroke="currentColor"
     strokeWidth="2"
@@ -169,8 +169,20 @@ const JoinCallButton: React.FC<JoinCallButtonProps> = ({
     : 'grid grid-cols-1 sm:grid-cols-2 gap-2';
 
   const buttonClass = compact
-    ? 'h-9 min-w-9 px-2.5 rounded-lg'
+    ? 'h-8 w-8 rounded-lg'
     : 'w-full px-4 py-2.5 rounded-xl';
+
+  const compactButtonStateClass = canJoin && loading === null
+    ? 'bg-white text-gray-600 border border-gray-300 hover:bg-gray-100'
+    : 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed';
+
+  const fullButtonAudioStateClass = canJoin && loading === null
+    ? 'bg-primary-500 text-white hover:bg-primary-600'
+    : 'bg-gray-200 text-gray-400 cursor-not-allowed';
+
+  const fullButtonVideoStateClass = canJoin && loading === null
+    ? 'bg-blue-500 text-white hover:bg-blue-600'
+    : 'bg-gray-200 text-gray-400 cursor-not-allowed';
 
   return (
     <div className={`flex flex-col gap-2 ${className}`}>
@@ -195,9 +207,7 @@ const JoinCallButton: React.FC<JoinCallButtonProps> = ({
           aria-label={loading === 'audio' ? 'Joining audio call' : 'Start audio call'}
           title={loading === 'audio' ? 'Joining audio call' : 'Start audio call'}
           className={`${buttonClass} flex items-center justify-center gap-1.5 text-sm font-semibold transition-colors
-            ${canJoin && loading === null
-              ? 'bg-primary-500 text-white hover:bg-primary-600'
-              : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
+            ${compact ? compactButtonStateClass : fullButtonAudioStateClass}`}
         >
           {loading === 'audio' ? <LoadingIcon /> : <AudioIcon />}
         </button>
@@ -208,9 +218,7 @@ const JoinCallButton: React.FC<JoinCallButtonProps> = ({
           aria-label={loading === 'video' ? 'Joining video call' : 'Start video call'}
           title={loading === 'video' ? 'Joining video call' : 'Start video call'}
           className={`${buttonClass} flex items-center justify-center gap-1.5 text-sm font-semibold transition-colors
-            ${canJoin && loading === null
-              ? 'bg-blue-500 text-white hover:bg-blue-600'
-              : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
+            ${compact ? compactButtonStateClass : fullButtonVideoStateClass}`}
         >
           {loading === 'video' ? <LoadingIcon /> : <VideoIcon />}
         </button>

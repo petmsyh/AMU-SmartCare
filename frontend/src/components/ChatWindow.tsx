@@ -51,12 +51,12 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
     .find((item) => item.senderId === user?.id)?.id;
 
   return (
-    <div className="border border-gray-200 rounded-2xl flex flex-col h-[68vh] sm:h-[440px] max-h-[760px] bg-white shadow-sm overflow-hidden relative">
-      <div className="px-4 py-3 border-b border-gray-200 bg-gray-50/95 backdrop-blur text-sm sticky top-0 z-20 shrink-0">
-        <div className="flex items-center justify-between gap-2">
+    <div className="border border-gray-200 rounded-xl sm:rounded-2xl flex flex-col h-[74vh] sm:h-[440px] max-h-[760px] bg-white shadow-sm overflow-hidden relative">
+      <div className="px-2.5 sm:px-4 py-2.5 sm:py-3 border-b border-gray-200 bg-gray-50/95 backdrop-blur text-sm sticky top-0 z-20 shrink-0">
+        <div className="flex items-center justify-between gap-1.5 sm:gap-2">
           <div className="flex items-center gap-2 min-w-0">
             {headerLeadingAction && <div className="shrink-0">{headerLeadingAction}</div>}
-            <span className="font-semibold truncate inline-flex items-center gap-1.5">
+            <span className="font-semibold truncate inline-flex items-center gap-1 text-[13px] sm:text-sm">
               <svg
                 viewBox="0 0 24 24"
                 className="w-4 h-4 text-gray-700"
@@ -75,7 +75,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
           {headerAction && <div className="shrink-0">{headerAction}</div>}
         </div>
       </div>
-      <div className="flex-1 min-h-0 overflow-y-auto px-3 py-3 sm:px-4 sm:py-4 flex flex-col gap-2.5">
+      <div className="flex-1 min-h-0 overflow-y-auto px-2.5 py-2.5 sm:px-4 sm:py-4 flex flex-col gap-2.5">
         {messages.length === 0 && (
           <p className="text-gray-400 text-sm text-center m-auto">
             No messages yet
@@ -117,7 +117,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
         })}
       </div>
       {!disabled && (
-        <div className="px-3 py-2.5 sm:px-4 sm:py-3 border-t border-gray-200 flex items-end gap-2 bg-white">
+        <div className="px-2.5 py-2 sm:px-4 sm:py-3 border-t border-gray-200 flex items-end gap-1.5 sm:gap-2 bg-white">
           <textarea
             ref={textAreaRef}
             value={text}
@@ -125,12 +125,12 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
             onKeyDown={handleKeyDown}
             placeholder="Type a message… (Enter to send)"
             rows={1}
-            className="flex-1 resize-none border border-gray-300 rounded-xl px-3 py-2 text-sm font-[inherit] min-h-[42px] max-h-[140px]"
+            className="flex-1 resize-none border border-gray-300 rounded-xl px-3 py-2 text-sm font-[inherit] min-h-[40px] max-h-[140px]"
           />
           <button
             onClick={handleSend}
             disabled={sending || !text.trim()}
-            className={`px-4 h-[42px] rounded-xl text-sm font-semibold bg-primary-500 text-white transition-colors
+            className={`px-3 sm:px-4 h-[40px] sm:h-[42px] rounded-xl text-sm font-semibold whitespace-nowrap bg-primary-500 text-white transition-colors
               ${sending || !text.trim() ? 'opacity-60 cursor-not-allowed' : 'hover:bg-primary-600'}`}
           >
             Send

@@ -206,8 +206,9 @@ const PatientConsultationDetail: React.FC = () => {
             headerLeadingAction={
               <button
                 onClick={() => navigate('/patient/consultations')}
-                className="h-8 px-2.5 rounded-lg border border-gray-300 text-[11px] font-semibold text-gray-700 bg-white hover:bg-gray-50"
+                className="h-8 px-2 sm:px-2.5 rounded-lg border border-gray-300 text-[11px] font-semibold text-gray-600 bg-white hover:bg-gray-100"
                 title="Other Consultations"
+                aria-label="Other Consultations"
               >
                 <span className="inline-flex items-center gap-1.5">
                   <svg
@@ -224,7 +225,7 @@ const PatientConsultationDetail: React.FC = () => {
                     <line x1="4" y1="12" x2="20" y2="12" />
                     <line x1="4" y1="18" x2="20" y2="18" />
                   </svg>
-                  <span>Other Consultations</span>
+                  <span className="hidden sm:inline">Other Consultations</span>
                 </span>
               </button>
             }
@@ -241,7 +242,7 @@ const PatientConsultationDetail: React.FC = () => {
                 )}
                 <button
                   onClick={() => setShowDetails((prev) => !prev)}
-                  className="h-9 min-w-9 px-2.5 rounded-lg border border-gray-300 text-sm font-semibold text-gray-700 bg-white hover:bg-gray-50"
+                  className="h-8 w-8 rounded-lg border border-gray-300 text-gray-600 bg-white hover:bg-gray-100 inline-flex items-center justify-center"
                   title={showDetails ? 'Hide Consultation Detail' : 'Show Consultation Detail'}
                   aria-label={showDetails ? 'Hide Consultation Detail' : 'Show Consultation Detail'}
                 >
