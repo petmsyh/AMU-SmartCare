@@ -129,13 +129,6 @@ const PatientConsultationDetail: React.FC = () => {
 
   return (
     <div className="max-w-[760px] mx-auto px-2 sm:px-0">
-      <button
-        onClick={() => navigate(-1)}
-        className="bg-transparent border-0 text-primary-500 cursor-pointer text-sm mb-4 p-0"
-      >
-        ← Back to Consultations
-      </button>
-
       {incomingCall && (
         <div className="mb-4 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -160,15 +153,6 @@ const PatientConsultationDetail: React.FC = () => {
           </div>
         </div>
       )}
-
-      <div className="mb-3 flex justify-end">
-        <button
-          onClick={() => setShowDetails((prev) => !prev)}
-          className="px-3 py-1.5 rounded-lg border border-gray-300 text-xs font-semibold text-gray-700 bg-white hover:bg-gray-50"
-        >
-          {showDetails ? 'Hide Consultation Detail' : 'Show Consultation Detail'}
-        </button>
-      </div>
 
       {showDetails && (
       <div className="card mb-4">
@@ -219,16 +203,64 @@ const PatientConsultationDetail: React.FC = () => {
           <ChatWindow
             consultationId={consultation.id}
             disabled={isCompleted}
+            headerLeadingAction={
+              <button
+                onClick={() => navigate('/patient/consultations')}
+                className="h-8 px-2.5 rounded-lg border border-gray-300 text-[11px] font-semibold text-gray-700 bg-white hover:bg-gray-50"
+                title="Other Consultations"
+              >
+                <span className="inline-flex items-center gap-1.5">
+                  <svg
+                    viewBox="0 0 24 24"
+                    className="w-3.5 h-3.5"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <line x1="4" y1="6" x2="20" y2="6" />
+                    <line x1="4" y1="12" x2="20" y2="12" />
+                    <line x1="4" y1="18" x2="20" y2="18" />
+                  </svg>
+                  <span>Other Consultations</span>
+                </span>
+              </button>
+            }
             headerAction={
-              isActive && consultation.scheduledAt ? (
-                <JoinCallButton
-                  appointmentId={consultation.id}
-                  scheduledAt={consultation.scheduledAt}
-                  hostUserId={consultation.doctorId}
-                  participantUserIds={[consultation.patientId, consultation.doctorId]}
-                  compact
-                />
-              ) : undefined
+              <div className="flex items-center gap-1.5">
+                {isActive && consultation.scheduledAt && (
+                  <JoinCallButton
+                    appointmentId={consultation.id}
+                    scheduledAt={consultation.scheduledAt}
+                    hostUserId={consultation.doctorId}
+                    participantUserIds={[consultation.patientId, consultation.doctorId]}
+                    compact
+                  />
+                )}
+                <button
+                  onClick={() => setShowDetails((prev) => !prev)}
+                  className="h-9 min-w-9 px-2.5 rounded-lg border border-gray-300 text-sm font-semibold text-gray-700 bg-white hover:bg-gray-50"
+                  title={showDetails ? 'Hide Consultation Detail' : 'Show Consultation Detail'}
+                  aria-label={showDetails ? 'Hide Consultation Detail' : 'Show Consultation Detail'}
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <circle cx="12" cy="12" r="9" />
+                    <line x1="12" y1="10" x2="12" y2="16" />
+                    <circle cx="12" cy="7" r="1" fill="currentColor" stroke="none" />
+                  </svg>
+                </button>
+              </div>
             }
           />
         </div>

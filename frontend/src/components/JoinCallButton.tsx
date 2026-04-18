@@ -19,6 +19,54 @@ interface JoinCallButtonProps {
   compact?: boolean;
 }
 
+const LoadingIcon: React.FC = () => (
+  <svg
+    viewBox="0 0 24 24"
+    className="w-5 h-5 animate-spin"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M21 12a9 9 0 1 1-2.64-6.36" />
+  </svg>
+);
+
+const AudioIcon: React.FC = () => (
+  <svg
+    viewBox="0 0 24 24"
+    className="w-5 h-5"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z" />
+    <path d="M5 10v2a7 7 0 0 0 14 0v-2" />
+    <line x1="12" y1="19" x2="12" y2="22" />
+  </svg>
+);
+
+const VideoIcon: React.FC = () => (
+  <svg
+    viewBox="0 0 24 24"
+    className="w-5 h-5"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <rect x="3" y="6" width="14" height="12" rx="2" />
+    <polygon points="17 10 21 8 21 16 17 14" />
+  </svg>
+);
+
 /**
  * Shows an audio/video join-call pair of buttons.
  * Buttons are enabled only within the allowed window:
@@ -151,7 +199,7 @@ const JoinCallButton: React.FC<JoinCallButtonProps> = ({
               ? 'bg-primary-500 text-white hover:bg-primary-600'
               : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
         >
-          <span className="text-lg" aria-hidden="true">{loading === 'audio' ? '⏳' : '🎙️'}</span>
+          {loading === 'audio' ? <LoadingIcon /> : <AudioIcon />}
         </button>
 
         <button
@@ -164,7 +212,7 @@ const JoinCallButton: React.FC<JoinCallButtonProps> = ({
               ? 'bg-blue-500 text-white hover:bg-blue-600'
               : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
         >
-          <span className="text-lg" aria-hidden="true">{loading === 'video' ? '⏳' : '📹'}</span>
+          {loading === 'video' ? <LoadingIcon /> : <VideoIcon />}
         </button>
       </div>
 
