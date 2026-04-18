@@ -14,7 +14,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ consultationId, disabled = fals
   const { user } = useSelector((state: RootState) => state.auth);
   const [text, setText] = useState('');
   const [sending, setSending] = useState(false);
-  const bottomRef = useRef<HTMLDivElement>(null);
+  const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     dispatch(fetchMessages(consultationId));
@@ -23,10 +23,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ consultationId, disabled = fals
     }, 5000);
     return () => clearInterval(interval);
   }, [consultationId, dispatch]);
-
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
 
   const handleSend = async () => {
     if (!text.trim() || sending) return;
@@ -43,6 +39,10 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ consultationId, disabled = fals
     }
   };
 
+  const latestOwnMessageId = [...messages]
+    .reverse()
+    .find((item) => item.senderId === user?.id)?.id;
+
   return (
     <div className="border border-gray-200 rounded-2xl flex flex-col h-[68vh] sm:h-[440px] max-h-[760px] bg-white shadow-sm overflow-hidden">
       <div className="px-4 py-3 border-b border-gray-200 font-semibold bg-gray-50 text-sm sticky top-0 z-10">
@@ -54,8 +54,13 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ consultationId, disabled = fals
             No messages yet
           </p>
         )}
-        {messages.map((msg) => {
+        {messages.map((msg, index) => {
           const isOwn = msg.senderId === user?.id;
+          const isLatestOwn = isOwn && msg.id === latestOwnMessageId;
+          const isSeenByPeer = messages
+            .slice(index + 1)
+            .some((item) => item.senderId !== user?.id);
+
           return (
             <div
               key={msg.id}
@@ -73,15 +78,21 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ consultationId, disabled = fals
               <div className={`text-[11px] text-gray-400 mt-1 ${isOwn ? 'text-right' : 'text-left'}`}>
                 {msg.sender?.username || 'Unknown'} &bull;{' '}
                 {new Date(msg.createdAt).toLocaleTimeString()}
+                {isLatestOwn && (
+                  <>
+                    {' '}
+                    &bull; {isSeenByPeer ? 'Seen' : 'Sent'}
+                  </>
+                )}
               </div>
             </div>
           );
         })}
-        <div ref={bottomRef} />
       </div>
       {!disabled && (
         <div className="px-3 py-2.5 sm:px-4 sm:py-3 border-t border-gray-200 flex items-end gap-2 bg-white">
           <textarea
+            ref={textAreaRef}
             value={text}
             onChange={(e) => setText(e.target.value)}
             onKeyDown={handleKeyDown}

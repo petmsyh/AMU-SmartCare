@@ -131,25 +131,25 @@ const JoinCallButton: React.FC<JoinCallButtonProps> = ({
         <button
           onClick={() => handleJoin('audio')}
           disabled={!canJoin || loading !== null}
+          aria-label={loading === 'audio' ? 'Joining audio call' : 'Start audio call'}
           className={`w-full flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors
             ${canJoin && loading === null
               ? 'bg-primary-500 text-white hover:bg-primary-600'
               : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
         >
-          {loading === 'audio' ? '⏳' : '🎙️'}
-          {loading === 'audio' ? 'Joining…' : 'Audio Call'}
+          <span className="text-lg" aria-hidden="true">{loading === 'audio' ? '⏳' : '🎙️'}</span>
         </button>
 
         <button
           onClick={() => handleJoin('video')}
           disabled={!canJoin || loading !== null}
+          aria-label={loading === 'video' ? 'Joining video call' : 'Start video call'}
           className={`w-full flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors
             ${canJoin && loading === null
               ? 'bg-blue-500 text-white hover:bg-blue-600'
               : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
         >
-          {loading === 'video' ? '⏳' : '📹'}
-          {loading === 'video' ? 'Joining…' : 'Video Call'}
+          <span className="text-lg" aria-hidden="true">{loading === 'video' ? '⏳' : '📹'}</span>
         </button>
       </div>
 

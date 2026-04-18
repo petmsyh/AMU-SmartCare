@@ -44,6 +44,7 @@ const PatientConsultationDetail: React.FC = () => {
   const [ratingSubmitted, setRatingSubmitted] = useState(false);
   const [ratingError, setRatingError] = useState('');
   const [confirming, setConfirming] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
   const [incomingCall, setIncomingCall] = useState<{
     roomId: string;
     from: string;
@@ -135,32 +136,42 @@ const PatientConsultationDetail: React.FC = () => {
         ← Back to Consultations
       </button>
 
-      <div className="card mb-4">
-        {incomingCall && (
-          <div className="mb-4 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="m-0 text-sm font-semibold text-blue-800">
-                Incoming {incomingCall.type} call
-              </p>
-              <p className="m-0 text-xs text-blue-700">From: {incomingCall.from}</p>
-            </div>
-            <div className="grid grid-cols-2 gap-2 sm:flex sm:gap-2">
-              <button
-                onClick={() => navigate(`/call/${incomingCall.roomId}?type=${incomingCall.type}`)}
-                className="px-3 py-2 rounded bg-success-500 text-white text-xs font-semibold"
-              >
-                Answer
-              </button>
-              <button
-                onClick={() => setIncomingCall(null)}
-                className="px-3 py-2 rounded bg-gray-200 text-gray-700 text-xs font-semibold"
-              >
-                Dismiss
-              </button>
-            </div>
+      {incomingCall && (
+        <div className="mb-4 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="m-0 text-sm font-semibold text-blue-800">
+              Incoming {incomingCall.type} call
+            </p>
+            <p className="m-0 text-xs text-blue-700">From: {incomingCall.from}</p>
           </div>
-        )}
+          <div className="grid grid-cols-2 gap-2 sm:flex sm:gap-2">
+            <button
+              onClick={() => navigate(`/call/${incomingCall.roomId}?type=${incomingCall.type}`)}
+              className="px-3 py-2 rounded bg-success-500 text-white text-xs font-semibold"
+            >
+              Answer
+            </button>
+            <button
+              onClick={() => setIncomingCall(null)}
+              className="px-3 py-2 rounded bg-gray-200 text-gray-700 text-xs font-semibold"
+            >
+              Dismiss
+            </button>
+          </div>
+        </div>
+      )}
 
+      <div className="mb-3 flex justify-end">
+        <button
+          onClick={() => setShowDetails((prev) => !prev)}
+          className="px-3 py-1.5 rounded-lg border border-gray-300 text-xs font-semibold text-gray-700 bg-white hover:bg-gray-50"
+        >
+          {showDetails ? 'Hide Consultation Detail' : 'Show Consultation Detail'}
+        </button>
+      </div>
+
+      {showDetails && (
+      <div className="card mb-4">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
           <h2 className="m-0 text-xl font-semibold">Consultation Detail</h2>
           <span className={`${badgeClass} px-3 py-1 rounded-full text-xs font-semibold capitalize`}>
@@ -214,6 +225,7 @@ const PatientConsultationDetail: React.FC = () => {
           </div>
         )}
       </div>
+      )}
 
       {(isActive || isCompleted) && (
         <div className="mb-4">
