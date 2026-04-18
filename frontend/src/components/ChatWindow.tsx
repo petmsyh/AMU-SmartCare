@@ -44,13 +44,13 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ consultationId, disabled = fals
   };
 
   return (
-    <div className="border border-gray-200 rounded-lg flex flex-col h-[400px] bg-white">
-      <div className="px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50 rounded-t-lg text-sm">
+    <div className="border border-gray-200 rounded-2xl flex flex-col h-[68vh] sm:h-[440px] max-h-[760px] bg-white shadow-sm overflow-hidden">
+      <div className="px-4 py-3 border-b border-gray-200 font-semibold bg-gray-50 text-sm sticky top-0 z-10">
         💬 Consultation Chat
       </div>
-      <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-2">
+      <div className="flex-1 overflow-y-auto px-3 py-3 sm:px-4 sm:py-4 flex flex-col gap-2.5">
         {messages.length === 0 && (
-          <p className="text-gray-400 text-[13px] text-center m-auto">
+          <p className="text-gray-400 text-sm text-center m-auto">
             No messages yet
           </p>
         )}
@@ -59,10 +59,10 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ consultationId, disabled = fals
           return (
             <div
               key={msg.id}
-              className={`max-w-[70%] ${isOwn ? 'self-end' : 'self-start'}`}
+              className={`max-w-[85%] sm:max-w-[72%] ${isOwn ? 'self-end' : 'self-start'}`}
             >
               <div
-                className={`px-3 py-2 text-sm break-words
+                className={`px-3.5 py-2 text-[14px] leading-5 break-words
                   ${isOwn
                     ? 'bg-primary-500 text-white rounded-[12px_12px_0_12px]'
                     : 'bg-gray-100 text-gray-800 rounded-[12px_12px_12px_0]'
@@ -70,7 +70,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ consultationId, disabled = fals
               >
                 {msg.content}
               </div>
-              <div className={`text-[11px] text-gray-400 mt-0.5 ${isOwn ? 'text-right' : 'text-left'}`}>
+              <div className={`text-[11px] text-gray-400 mt-1 ${isOwn ? 'text-right' : 'text-left'}`}>
                 {msg.sender?.username || 'Unknown'} &bull;{' '}
                 {new Date(msg.createdAt).toLocaleTimeString()}
               </div>
@@ -80,19 +80,20 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ consultationId, disabled = fals
         <div ref={bottomRef} />
       </div>
       {!disabled && (
-        <div className="p-2 border-t border-gray-200 flex gap-2">
+        <div className="px-3 py-2.5 sm:px-4 sm:py-3 border-t border-gray-200 flex items-end gap-2 bg-white">
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Type a message… (Enter to send)"
-            rows={2}
-            className="flex-1 resize-none border border-gray-300 rounded px-2 py-1.5 text-[13px] font-[inherit]"
+            rows={1}
+            className="flex-1 resize-none border border-gray-300 rounded-xl px-3 py-2 text-sm font-[inherit] min-h-[42px] max-h-[140px]"
           />
           <button
             onClick={handleSend}
             disabled={sending || !text.trim()}
-            className={`btn btn-primary px-4 text-sm ${sending || !text.trim() ? 'opacity-60 cursor-not-allowed' : ''}`}
+            className={`px-4 h-[42px] rounded-xl text-sm font-semibold bg-primary-500 text-white transition-colors
+              ${sending || !text.trim() ? 'opacity-60 cursor-not-allowed' : 'hover:bg-primary-600'}`}
           >
             Send
           </button>

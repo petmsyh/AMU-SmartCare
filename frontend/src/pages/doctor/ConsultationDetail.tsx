@@ -109,7 +109,7 @@ const DoctorConsultationDetail: React.FC = () => {
   const badgeClass = statusClasses[consultation.status] ?? 'bg-gray-100 text-gray-600';
 
   return (
-    <div className="max-w-[700px]">
+    <div className="max-w-[760px] mx-auto px-2 sm:px-0">
       <button
         onClick={() => navigate(-1)}
         className="bg-transparent border-0 text-primary-500 cursor-pointer text-sm mb-4 p-0"
@@ -119,23 +119,23 @@ const DoctorConsultationDetail: React.FC = () => {
 
       <div className="card mb-4">
         {incomingCall && (
-          <div className="mb-4 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mb-4 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="m-0 text-sm font-semibold text-blue-800">
                 Incoming {incomingCall.type} call
               </p>
               <p className="m-0 text-xs text-blue-700">From: {incomingCall.from}</p>
             </div>
-            <div className="flex gap-2">
+            <div className="grid grid-cols-2 gap-2 sm:flex sm:gap-2">
               <button
                 onClick={() => navigate(`/call/${incomingCall.roomId}?type=${incomingCall.type}`)}
-                className="px-3 py-1.5 rounded bg-success-500 text-white text-xs font-semibold"
+                className="px-3 py-2 rounded bg-success-500 text-white text-xs font-semibold"
               >
                 Answer
               </button>
               <button
                 onClick={() => setIncomingCall(null)}
-                className="px-3 py-1.5 rounded bg-gray-200 text-gray-700 text-xs font-semibold"
+                className="px-3 py-2 rounded bg-gray-200 text-gray-700 text-xs font-semibold"
               >
                 Dismiss
               </button>
@@ -143,14 +143,14 @@ const DoctorConsultationDetail: React.FC = () => {
           </div>
         )}
 
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
           <h2 className="m-0 text-xl font-semibold">Consultation Detail</h2>
           <span className={`${badgeClass} px-3 py-1 rounded-full text-xs font-semibold capitalize`}>
             {consultation.status.replace('_', ' ')}
           </span>
         </div>
 
-        <div className="grid grid-cols-2 gap-2.5 mb-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-4">
           {[
             { label: 'Patient', value: consultation.patient?.username || consultation.patientId },
             { label: 'Scheduled', value: consultation.scheduledAt ? new Date(consultation.scheduledAt).toLocaleString() : 'Not set' },

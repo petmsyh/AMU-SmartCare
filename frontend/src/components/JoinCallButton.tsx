@@ -127,11 +127,11 @@ const JoinCallButton: React.FC<JoinCallButtonProps> = ({
         </span>
       </div>
 
-      <div className="flex gap-2 flex-wrap">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
         <button
           onClick={() => handleJoin('audio')}
           disabled={!canJoin || loading !== null}
-          className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-colors
+          className={`w-full flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors
             ${canJoin && loading === null
               ? 'bg-primary-500 text-white hover:bg-primary-600'
               : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
@@ -143,7 +143,7 @@ const JoinCallButton: React.FC<JoinCallButtonProps> = ({
         <button
           onClick={() => handleJoin('video')}
           disabled={!canJoin || loading !== null}
-          className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-colors
+          className={`w-full flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors
             ${canJoin && loading === null
               ? 'bg-blue-500 text-white hover:bg-blue-600'
               : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
