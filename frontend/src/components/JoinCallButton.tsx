@@ -15,6 +15,8 @@ interface JoinCallButtonProps {
   defaultCallType?: CallType;
   /** Extra Tailwind classes */
   className?: string;
+  /** Render minimal icon-only controls for compact places like chat header */
+  compact?: boolean;
 }
 
 /**
@@ -31,6 +33,7 @@ const JoinCallButton: React.FC<JoinCallButtonProps> = ({
   hostUserId,
   participantUserIds,
   className = '',
+  compact = false,
 }) => {
   const navigate = useNavigate();
   const { user } = useSelector((state: RootState) => state.auth);
@@ -113,26 +116,37 @@ const JoinCallButton: React.FC<JoinCallButtonProps> = ({
 
   if (!scheduled) return null;
 
+  const buttonGridClass = compact
+    ? 'flex items-center gap-1.5'
+    : 'grid grid-cols-1 sm:grid-cols-2 gap-2';
+
+  const buttonClass = compact
+    ? 'h-9 min-w-9 px-2.5 rounded-lg'
+    : 'w-full px-4 py-2.5 rounded-xl';
+
   return (
     <div className={`flex flex-col gap-2 ${className}`}>
-      <div className="text-xs">
-        <span
-          className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full font-semibold
-            ${isOnline ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}
-        >
+      {!compact && (
+        <div className="text-xs">
           <span
-            className={`w-2 h-2 rounded-full ${isOnline ? 'bg-green-500' : 'bg-red-500'}`}
-          />
-          {isOnline ? 'Client is online' : 'Client is offline'}
-        </span>
-      </div>
+            className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full font-semibold
+              ${isOnline ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}
+          >
+            <span
+              className={`w-2 h-2 rounded-full ${isOnline ? 'bg-green-500' : 'bg-red-500'}`}
+            />
+            {isOnline ? 'Client is online' : 'Client is offline'}
+          </span>
+        </div>
+      )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+      <div className={buttonGridClass}>
         <button
           onClick={() => handleJoin('audio')}
           disabled={!canJoin || loading !== null}
           aria-label={loading === 'audio' ? 'Joining audio call' : 'Start audio call'}
-          className={`w-full flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors
+          title={loading === 'audio' ? 'Joining audio call' : 'Start audio call'}
+          className={`${buttonClass} flex items-center justify-center gap-1.5 text-sm font-semibold transition-colors
             ${canJoin && loading === null
               ? 'bg-primary-500 text-white hover:bg-primary-600'
               : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
@@ -144,7 +158,8 @@ const JoinCallButton: React.FC<JoinCallButtonProps> = ({
           onClick={() => handleJoin('video')}
           disabled={!canJoin || loading !== null}
           aria-label={loading === 'video' ? 'Joining video call' : 'Start video call'}
-          className={`w-full flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors
+          title={loading === 'video' ? 'Joining video call' : 'Start video call'}
+          className={`${buttonClass} flex items-center justify-center gap-1.5 text-sm font-semibold transition-colors
             ${canJoin && loading === null
               ? 'bg-blue-500 text-white hover:bg-blue-600'
               : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
@@ -153,7 +168,7 @@ const JoinCallButton: React.FC<JoinCallButtonProps> = ({
         </button>
       </div>
 
-      {!canJoin && (
+      {!compact && !canJoin && (
         <p className="text-xs text-gray-500">
           Call available 10 min before scheduled time
           {scheduledAt
@@ -163,13 +178,13 @@ const JoinCallButton: React.FC<JoinCallButtonProps> = ({
         </p>
       )}
 
-      {bypassCallWindow && (
+      {!compact && bypassCallWindow && (
         <p className="text-xs text-amber-600">
           Call window bypass is enabled for testing.
         </p>
       )}
 
-      {error && (
+      {!compact && error && (
         <p className="text-xs text-red-500">{error}</p>
       )}
     </div>

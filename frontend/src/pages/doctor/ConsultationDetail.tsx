@@ -219,24 +219,25 @@ const DoctorConsultationDetail: React.FC = () => {
           )}
         </div>
 
-        {isActive && consultation.scheduledAt && (
-          <div className="mt-4 pt-4 border-t border-gray-100">
-            <p className="text-xs text-gray-500 mb-2 font-semibold uppercase tracking-wide">
-              Join Scheduled Call
-            </p>
-            <JoinCallButton
-              appointmentId={consultation.id}
-              scheduledAt={consultation.scheduledAt}
-              hostUserId={consultation.doctorId}
-              participantUserIds={[consultation.patientId, consultation.doctorId]}
-            />
-          </div>
-        )}
       </div>
       )}
 
       {(isActive || isCompleted) && (
-        <ChatWindow consultationId={consultation.id} disabled={isCompleted} />
+        <ChatWindow
+          consultationId={consultation.id}
+          disabled={isCompleted}
+          headerAction={
+            isActive && consultation.scheduledAt ? (
+              <JoinCallButton
+                appointmentId={consultation.id}
+                scheduledAt={consultation.scheduledAt}
+                hostUserId={consultation.doctorId}
+                participantUserIds={[consultation.patientId, consultation.doctorId]}
+                compact
+              />
+            ) : undefined
+          }
+        />
       )}
     </div>
   );
