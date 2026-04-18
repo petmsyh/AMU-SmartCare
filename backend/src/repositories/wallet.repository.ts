@@ -17,17 +17,6 @@ export const walletRepository = {
     });
   },
 
-  async findOrCreateByUserId(userId: string) {
-    return prisma.wallet.upsert({
-      where: { userId },
-      update: {},
-      create: {
-        userId,
-        balance: 0,
-      },
-    });
-  },
-
   async update(userId: string, data: Prisma.WalletUpdateInput) {
     return prisma.wallet.update({ where: { userId }, data });
   },
