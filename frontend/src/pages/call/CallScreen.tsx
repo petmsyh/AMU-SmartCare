@@ -51,6 +51,22 @@ const ConnectionDot: React.FC<{ state: RTCPeerConnectionState | undefined }> = (
   return <span className={`inline-block w-2 h-2 rounded-full ${color}`} />;
 };
 
+// Mounting an audio element is required for remote audio tracks to be audible.
+const RemoteAudio: React.FC<{ stream: MediaStream }> = ({ stream }) => {
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.srcObject = stream;
+      void audioRef.current.play().catch(() => {
+        // Browser autoplay policy can block playback until a user gesture.
+      });
+    }
+  }, [stream]);
+
+  return <audio ref={audioRef} autoPlay playsInline />;
+};
+
 const CallScreen: React.FC = () => {
   const { roomId } = useParams<{ roomId: string }>();
   const [searchParams] = useSearchParams();
@@ -224,6 +240,13 @@ const CallScreen: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-950 text-white">
+      {/* Hidden audio sinks for remote participants (needed for audio-only calls) */}
+      <div className="hidden">
+        {remoteStreams.map(({ userId: pid, stream }) => (
+          <RemoteAudio key={`audio-${pid}`} stream={stream} />
+        ))}
+      </div>
+
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 bg-gray-900">
         <div className="flex items-center gap-2">
