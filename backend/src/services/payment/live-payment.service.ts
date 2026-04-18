@@ -1,4 +1,4 @@
-import { IPaymentService, PaymentResult } from './payment.interface';
+import { IPaymentService, PaymentResult, WithdrawalResult } from './payment.interface';
 
 export class LivePaymentService implements IPaymentService {
   async initiatePayment(_consultationId: string, _patientId: string, _amount: number): Promise<PaymentResult> {
@@ -17,7 +17,7 @@ export class LivePaymentService implements IPaymentService {
     throw new Error('Live payment not implemented');
   }
 
-  async processDoctorWithdrawal(_doctorId: string, _amount: number): Promise<void> {
+  async processDoctorWithdrawal(_doctorId: string, _amount: number): Promise<WithdrawalResult> {
     throw new Error('Live payment not implemented');
   }
 }

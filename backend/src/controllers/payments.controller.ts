@@ -75,8 +75,8 @@ export const paymentsController = {
     try {
       const doctorId = req.user!.id;
       const { amount } = req.body as { amount: number };
-      await paymentService.processDoctorWithdrawal(doctorId, amount);
-      res.json({ success: true, message: 'Withdrawal processed' });
+      const result = await paymentService.processDoctorWithdrawal(doctorId, amount);
+      res.json({ success: true, data: result, message: 'Withdrawal processed' });
     } catch (err) {
       const error = err as Error & { statusCode?: number };
       res.status(error.statusCode || 500).json({ success: false, error: error.message });
@@ -86,7 +86,7 @@ export const paymentsController = {
   async getWallet(req: AuthRequest, res: Response): Promise<void> {
     try {
       const userId = req.user!.id;
-      const wallet = await walletRepository.findByUserId(userId);
+      const wallet = await walletRepository.findOrCreateByUserId(userId);
       res.json({ success: true, data: wallet });
     } catch (err) {
       const error = err as Error & { statusCode?: number };

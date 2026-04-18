@@ -1,4 +1,4 @@
-import { IPaymentService, PaymentResult } from './payment.interface';
+import { IPaymentService, PaymentResult, WithdrawalResult } from './payment.interface';
 import { transactionRepository } from '../../repositories/transaction.repository';
 import { walletRepository } from '../../repositories/wallet.repository';
 import { consultationRepository } from '../../repositories/consultation.repository';
@@ -181,14 +181,14 @@ export class MockPaymentService implements IPaymentService {
     logger.info(`Refund processed: txn=${transactionId}, amount=${amount}`);
   }
 
-  async processDoctorWithdrawal(doctorId: string, amount: number): Promise<void> {
+  async processDoctorWithdrawal(doctorId: string, amount: number): Promise<WithdrawalResult> {
     const wallet = await walletRepository.findByUserId(doctorId);
     if (!wallet) throw new Error('Wallet not found');
     if (Number(wallet.balance) < amount) throw new Error('Insufficient balance');
 
-    await walletRepository.decrementBalance(doctorId, amount);
+    const updatedWallet = await walletRepository.decrementBalance(doctorId, amount);
 
-    await transactionRepository.create({
+    const transaction = await transactionRepository.create({
       userId: doctorId,
       amount,
       type: TransactionType.withdrawal,
@@ -199,5 +199,10 @@ export class MockPaymentService implements IPaymentService {
     });
 
     logger.info(`Doctor withdrawal: doctorId=${doctorId}, amount=${amount}`);
+
+    return {
+      wallet: updatedWallet,
+      transaction,
+    };
   }
 }
