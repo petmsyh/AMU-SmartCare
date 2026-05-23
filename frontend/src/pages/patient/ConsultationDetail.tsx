@@ -10,7 +10,7 @@ import {
 import ChatWindow from '../../components/ChatWindow';
 import RatingStars from '../../components/RatingStars';
 import JoinCallButton from '../../components/JoinCallButton';
-import { subscribeToSignals } from '../../firebase/callService';
+import { subscribeToSignals, clearLocalCallSignalCache, subscribeToRoom } from '../../firebase/callService';
 import { CallType } from '../../types/calls';
 
 const MAX_RING_SIGNAL_AGE_MS = 45 * 1000;
@@ -61,6 +61,7 @@ const PatientConsultationDetail: React.FC = () => {
 
     const roomId = `appt-${consultation.id}`;
     let unsub: (() => void) | undefined;
+    let unsubRoom: (() => void) | undefined;
 
     try {
       unsub = subscribeToSignals(roomId, (signal) => {
@@ -78,12 +79,26 @@ const PatientConsultationDetail: React.FC = () => {
           type: payload.callType === 'audio' ? 'audio' : 'video',
         });
       });
+
+      // Also subscribe to room updates so we can clear the incoming banner when
+      // the room status changes (for example when the caller hangs up).
+      unsubRoom = subscribeToRoom(roomId, (r) => {
+        if (r.status !== 'ringing') {
+          setIncomingCall(null);
+          // Also clear any locally persisted signals for this room to avoid
+          // re-showing the banner due to old localStorage entries.
+          try {
+            clearLocalCallSignalCache(roomId);
+          } catch {}
+        }
+      });
     } catch (_) {
-      // Ignore signal subscription issues; call page will still be available.
+      // Ignore subscription issues; best-effort only.
     }
 
     return () => {
       unsub?.();
+      unsubRoom?.();
     };
   }, [consultation, user?.id]);
 
@@ -139,13 +154,23 @@ const PatientConsultationDetail: React.FC = () => {
           </div>
           <div className="grid grid-cols-2 gap-2 sm:flex sm:gap-2">
             <button
-              onClick={() => navigate(`/call/${incomingCall.roomId}?type=${incomingCall.type}`)}
+              onClick={() => {
+                try {
+                  clearLocalCallSignalCache(incomingCall.roomId);
+                } catch {}
+                navigate(`/call/${incomingCall.roomId}?type=${incomingCall.type}`);
+              }}
               className="px-3 py-2 rounded bg-success-500 text-white text-xs font-semibold"
             >
               Answer
             </button>
             <button
-              onClick={() => setIncomingCall(null)}
+              onClick={() => {
+                try {
+                  clearLocalCallSignalCache(incomingCall.roomId);
+                } catch {}
+                setIncomingCall(null);
+              }}
               className="px-3 py-2 rounded bg-gray-200 text-gray-700 text-xs font-semibold"
             >
               Dismiss
