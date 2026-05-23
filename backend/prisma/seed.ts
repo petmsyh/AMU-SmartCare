@@ -8,12 +8,12 @@ async function main() {
   console.log('Seeding database...');
 
   // Admin user
-  const adminPassword = await bcrypt.hash('Admin1234!', 12);
+  const adminPassword = await bcrypt.hash('Peter@12345', 12);
   const admin = await prisma.user.upsert({
-    where: { email: 'admin@amu.edu' },
+    where: { email: 'pitermessay2020@gmail.com' },
     update: {},
     create: {
-      email: 'admin@amu.edu',
+      email: 'pitermessay2020@gmail.com',
       username: 'admin',
       passwordHash: adminPassword,
       role: Role.admin,
@@ -23,12 +23,12 @@ async function main() {
   console.log('Created admin:', admin.email);
 
   // Sample patient
-  const patientPassword = await bcrypt.hash('Patient1234!', 12);
+  const patientPassword = await bcrypt.hash('Evelyn@12345', 12);
   const patient = await prisma.user.upsert({
-    where: { email: 'patient@example.com' },
+    where: { email: 'petermesay7@gmail.com' },
     update: {},
     create: {
-      email: 'patient@example.com',
+      email: 'petermesay7@gmail.com',
       username: 'john_patient',
       passwordHash: patientPassword,
       role: Role.patient,
@@ -39,12 +39,12 @@ async function main() {
   console.log('Created patient:', patient.email);
 
   // Doctor 1
-  const doctor1Password = await bcrypt.hash('Doctor1234!', 12);
+  const doctor1Password = await bcrypt.hash('Dani@12345', 12);
   const doctor1 = await prisma.user.upsert({
-    where: { email: 'dr.kebede@amu.edu' },
+    where: { email: 'pimessay@gmail.com' },
     update: {},
     create: {
-      email: 'dr.kebede@amu.edu',
+      email: 'pimessay@gmail.com',
       username: 'dr_kebede',
       passwordHash: doctor1Password,
       role: Role.doctor,

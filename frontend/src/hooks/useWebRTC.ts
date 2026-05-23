@@ -185,10 +185,12 @@ export function useWebRTC({
       // stream so the call screen can still open instead of failing hard.
       if (callType === 'audio') {
         setMediaWarning('No microphone was found. Joining without local audio.');
+        setIsMuted(true);
         return new MediaStream();
       }
 
       setMediaWarning('No camera was found. Joining with audio only.');
+      setIsCameraOff(true);
       return navigator.mediaDevices.getUserMedia({ audio: true, video: false });
     }
   }, [callType]);
@@ -345,6 +347,10 @@ export function useWebRTC({
         pendingIceRef.current.clear();
         setRemoteStreams([]);
         setConnectionStates({});
+        setLocalStream(null);
+        setIsMuted(false);
+        setIsCameraOff(false);
+        setMediaWarning('');
 
         // Drop stale local signals from previous call sessions for this room.
         clearLocalCallSignalCache(roomId);

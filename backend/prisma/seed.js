@@ -1,18 +1,19 @@
-require('dotenv/config');
-const { PrismaClient, Role, DoctorTier } = require('@prisma/client');
-const bcrypt = require('bcryptjs');
+import 'dotenv/config';
+import { PrismaClient, Role, DoctorTier } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
 async function main() {
   console.log('Seeding database...');
 
-  const adminPassword = await bcrypt.hash('Admin1234!', 12);
+  // Admin user
+  const adminPassword = await bcrypt.hash('Peter@12345', 12);
   const admin = await prisma.user.upsert({
-    where: { email: 'admin@amu.edu' },
+    where: { email: 'pitermessay2020@gmail.com' },
     update: {},
     create: {
-      email: 'admin@amu.edu',
+      email: 'pitermessay2020@gmail.com',
       username: 'admin',
       passwordHash: adminPassword,
       role: Role.admin,
@@ -21,12 +22,13 @@ async function main() {
   });
   console.log('Created admin:', admin.email);
 
-  const patientPassword = await bcrypt.hash('Patient1234!', 12);
+  // Sample patient
+  const patientPassword = await bcrypt.hash('Evelyn@12345', 12);
   const patient = await prisma.user.upsert({
-    where: { email: 'patient@example.com' },
+    where: { email: 'petermesay7@gmail.com' },
     update: {},
     create: {
-      email: 'patient@example.com',
+      email: 'petermesay7@gmail.com',
       username: 'john_patient',
       passwordHash: patientPassword,
       role: Role.patient,
@@ -36,12 +38,13 @@ async function main() {
   });
   console.log('Created patient:', patient.email);
 
-  const doctor1Password = await bcrypt.hash('Doctor1234!', 12);
+  // Doctor 1
+  const doctor1Password = await bcrypt.hash('Dani@12345', 12);
   const doctor1 = await prisma.user.upsert({
-    where: { email: 'dr.kebede@amu.edu' },
+    where: { email: 'pimessay@gmail.com' },
     update: {},
     create: {
-      email: 'dr.kebede@amu.edu',
+      email: 'pimessay@gmail.com',
       username: 'dr_kebede',
       passwordHash: doctor1Password,
       role: Role.doctor,
@@ -67,6 +70,7 @@ async function main() {
   });
   console.log('Created doctor 1:', doctor1.email);
 
+  // Doctor 2
   const doctor2Password = await bcrypt.hash('Doctor1234!', 12);
   const doctor2 = await prisma.user.upsert({
     where: { email: 'dr.tigist@amu.edu' },
@@ -98,6 +102,7 @@ async function main() {
   });
   console.log('Created doctor 2:', doctor2.email);
 
+  // Doctor 3
   const doctor3Password = await bcrypt.hash('Doctor1234!', 12);
   const doctor3 = await prisma.user.upsert({
     where: { email: 'dr.yonas@amu.edu' },
@@ -135,8 +140,8 @@ async function main() {
 }
 
 main()
-  .catch((error) => {
-    console.error(error);
+  .catch((e) => {
+    console.error(e);
     process.exit(1);
   })
   .finally(async () => {
