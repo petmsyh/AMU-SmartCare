@@ -1,6 +1,6 @@
-import 'dotenv/config';
-import { PrismaClient, Role, DoctorTier } from '@prisma/client';
-import bcrypt from 'bcryptjs';
+require('dotenv/config');
+const { PrismaClient, Role, DoctorTier } = require('@prisma/client');
+const bcrypt = require('bcryptjs');
 
 const prisma = new PrismaClient();
 
@@ -140,8 +140,8 @@ async function main() {
 }
 
 main()
-  .catch((e) => {
-    console.error(e);
+  .catch((error) => {
+    console.error(error);
     process.exit(1);
   })
   .finally(async () => {

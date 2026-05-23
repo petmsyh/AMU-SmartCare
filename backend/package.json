@@ -9,9 +9,10 @@
     "start": "node dist/index.js",
     "db:migrate": "prisma migrate dev",
     "db:migrate:deploy": "prisma migrate deploy",
+    "db:migrate:deploy:retry": "sh -c 'for i in 1 2 3 4 5 6; do prisma migrate deploy && exit 0; echo \"Database not reachable yet, retrying ($i/6)...\"; sleep 5; done; exit 1'",
     "db:generate": "prisma generate",
-    "db:seed": "ts-node prisma/seed.ts",
-    "db:setup": "npm run db:migrate:deploy && npm run db:seed",
+    "db:seed": "node prisma/seed.js",
+    "db:setup": "npm run db:migrate:deploy:retry && npm run db:seed",
     "lint": "eslint src --ext .ts",
     "test": "jest"
   },
