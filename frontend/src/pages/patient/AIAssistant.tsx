@@ -29,16 +29,19 @@ const AIAssistant: React.FC = () => {
         message: userMsg.content,
         history: messages,
       });
+      const reply = res.data?.data?.reply || res.data?.reply || res.data?.message || 'No response';
       setMessages((prev) => [
         ...prev,
-        { role: 'assistant', content: res.data.reply || res.data.message || 'No response' },
+        { role: 'assistant', content: reply },
       ]);
-    } catch {
+    } catch (err: any) {
+      console.error('AI chat error', err);
+      const serverMsg = err?.response?.data?.error || err?.message;
       setMessages((prev) => [
         ...prev,
         {
           role: 'assistant',
-          content: 'Sorry, I\'m unable to respond right now. Please try again later or consult a doctor directly.',
+          content: serverMsg || "Sorry, I\'m unable to respond right now. Please try again later or consult a doctor directly.",
         },
       ]);
     }

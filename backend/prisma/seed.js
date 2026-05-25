@@ -38,6 +38,22 @@ async function main() {
   });
   console.log('Created patient:', patient.email);
 
+  // Student
+  const studentPassword = await bcrypt.hash('Kenu@12345', 12);
+  const student = await prisma.user.upsert({
+    where: { email: 'petermesay777@gmail.com' },
+    update: {},
+    create: {
+      email: 'petermesay777@gmail.com',
+      username: 'student_peterm777',
+      passwordHash: studentPassword,
+      role: Role.student,
+      isVerified: true,
+      department: 'medicine',
+    },
+  });
+  console.log('Created student:', student.email);
+
   // Doctor 1
   const doctor1Password = await bcrypt.hash('Dani@12345', 12);
   const doctor1 = await prisma.user.upsert({

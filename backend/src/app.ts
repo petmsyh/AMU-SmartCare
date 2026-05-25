@@ -15,6 +15,8 @@ import messagesRoutes from './routes/messages.routes';
 import ratingsRoutes from './routes/ratings.routes';
 import paymentsRoutes from './routes/payments.routes';
 import adminRoutes from './routes/admin.routes';
+import aiRoutes from './routes/ai.routes';
+import studentRoutes from './routes/student.routes';
 
 dotenv.config();
 
@@ -62,6 +64,8 @@ app.use('/api/messages', messagesRoutes);
 app.use('/api/ratings', ratingsRoutes);
 app.use('/api/payments', paymentsRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/ai', aiRoutes);
+app.use('/api/student', studentRoutes);
 
 // 404 handler
 app.use((_req, res) => {

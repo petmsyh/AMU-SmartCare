@@ -10,7 +10,8 @@ const registerSchema = z.object({
   email: z.string().email(),
   username: z.string().min(3).max(50),
   password: z.string().min(8),
-  role: z.enum(['patient', 'doctor', 'student', 'admin']).optional(),
+  // disallow student in public registration
+  role: z.enum(['patient', 'doctor', 'admin']).optional(),
 });
 
 const loginSchema = z.object({

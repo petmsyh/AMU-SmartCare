@@ -14,6 +14,11 @@ const AdminUsers: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [actionMsg, setActionMsg] = useState('');
+  const [creating, setCreating] = useState(false);
+  const [newEmail, setNewEmail] = useState('');
+  const [newUsername, setNewUsername] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [newDepartment, setNewDepartment] = useState('medicine');
 
   const loadUsers = async () => {
     setLoading(true);
@@ -85,6 +90,76 @@ const AdminUsers: React.FC = () => {
       )}
 
       <div className="card overflow-hidden">
+        {/* Create student form */}
+        <div className="p-4 border-b">
+          <h3 className="mb-2 text-sm font-semibold">Create Student</h3>
+          <div className="grid grid-cols-4 gap-2">
+            <input
+              value={newEmail}
+              onChange={(e) => setNewEmail(e.target.value)}
+              placeholder="student email"
+              className="form-input col-span-1"
+            />
+            <input
+              value={newUsername}
+              onChange={(e) => setNewUsername(e.target.value)}
+              placeholder="username"
+              className="form-input col-span-1"
+            />
+            <input
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              placeholder="password"
+              type="password"
+              className="form-input col-span-1"
+            />
+            <select
+              value={newDepartment}
+              onChange={(e) => setNewDepartment(e.target.value)}
+              className="form-select col-span-1"
+            >
+              <option value="medicine">Medicine</option>
+              <option value="pharmacy">Pharmacy</option>
+              <option value="nursing">Nursing</option>
+              <option value="general">General</option>
+            </select>
+          </div>
+          <div className="mt-3">
+            <button
+              onClick={async () => {
+                if (!newEmail || !newUsername || !newPassword) {
+                  setActionMsg('Please fill email, username and password');
+                  setTimeout(() => setActionMsg(''), 3000);
+                  return;
+                }
+                setCreating(true);
+                try {
+                  await api.post('/admin/students', {
+                    email: newEmail,
+                    username: newUsername,
+                    password: newPassword,
+                    department: newDepartment,
+                  });
+                  setActionMsg('Student created');
+                  setNewEmail('');
+                  setNewUsername('');
+                  setNewPassword('');
+                  setNewDepartment('medicine');
+                  loadUsers();
+                } catch (err: any) {
+                  setActionMsg(err.response?.data?.error || 'Failed to create');
+                } finally {
+                  setCreating(false);
+                  setTimeout(() => setActionMsg(''), 3000);
+                }
+              }}
+              disabled={creating}
+              className="btn-primary mt-2 px-4 py-2"
+            >
+              {creating ? 'Creating…' : 'Create Student'}
+            </button>
+          </div>
+        </div>
         <table className="w-full border-collapse text-sm">
           <thead>
             <tr className="border-b-2 border-gray-200 bg-gray-50">

@@ -28,19 +28,26 @@ const StudentDashboard: React.FC = () => {
     setInput('');
     setLoading(true);
 
-    const responses: Record<string, string> = {
-      default:
-        "That's a great question for your studies! As a medical student, understanding the pathophysiology is key. I recommend reviewing Harrison's Principles of Internal Medicine for detailed clinical correlations.",
-    };
-    await new Promise((r) => setTimeout(r, 800));
-    setMessages((prev) => [
-      ...prev,
-      {
-        role: 'assistant' as const,
-        content: responses[input.toLowerCase()] || responses.default,
-      },
-    ]);
-    setLoading(false);
+    try {
+      const res = await (await import('../../api/axios')).default.post('/ai/chat', {
+        message: userMsg.content,
+        history: messages,
+      });
+      const reply = res.data?.data?.reply || res.data?.reply || 'No response';
+      setMessages((prev) => [...prev, { role: 'assistant' as const, content: reply }]);
+    } catch (err: any) {
+      console.error('AI error', err);
+      const serverMsg = err?.response?.data?.error || err?.message;
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: 'assistant' as const,
+          content: serverMsg || "Sorry, I couldn't reach the AI assistant. Try again later or consult course materials.",
+        },
+      ]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {

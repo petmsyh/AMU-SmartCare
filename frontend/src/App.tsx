@@ -26,6 +26,7 @@ import DoctorConsultationDetail from './pages/doctor/ConsultationDetail';
 import DoctorWallet from './pages/doctor/DoctorWallet';
 
 import StudentDashboard from './pages/student/StudentDashboard';
+import StudentCourses from './pages/student/Courses';
 
 import AdminDashboard from './pages/admin/AdminDashboard';
 import CallScreen from './pages/call/CallScreen';
@@ -192,6 +193,26 @@ const App: React.FC = () => {
             <ProtectedRoute allowedRoles={['student']}>
               <Layout>
                 <StudentDashboard />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/student/ai-assistant"
+          element={
+            <ProtectedRoute allowedRoles={['student']}>
+              <Layout>
+                <StudentDashboard />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/student/courses"
+          element={
+            <ProtectedRoute allowedRoles={['student']}>
+              <Layout>
+                <StudentCourses />
               </Layout>
             </ProtectedRoute>
           }

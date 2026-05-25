@@ -7,6 +7,10 @@ export const authController = {
   async register(req: AuthRequest, res: Response): Promise<void> {
     try {
       const { email, username, password, role } = req.body as { email: string; username: string; password: string; role: Role };
+      if (role === Role.student) {
+        res.status(403).json({ success: false, error: 'Student accounts cannot be created via public registration' });
+        return;
+      }
       const result = await authService.register(email, username, password, role || Role.patient);
       res.status(201).json({ success: true, data: result });
     } catch (err) {

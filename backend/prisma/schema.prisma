@@ -11,6 +11,7 @@ model User {
   id           String   @id @default(uuid())
   email        String   @unique
   username     String   @unique
+  department   String?
   passwordHash String
   role         Role     @default(patient)
   isVerified   Boolean  @default(false)

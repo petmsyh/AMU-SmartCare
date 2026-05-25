@@ -8,6 +8,7 @@ const router = Router();
 router.use(authMiddleware, requireRole('admin'));
 
 router.get('/users', adminController.listUsers);
+router.post('/students', adminController.createStudent);
 router.patch('/users/:id/verify', adminController.verifyUser);
 router.patch('/users/:id/disable', adminController.toggleUserActive);
 router.delete('/ratings/:id', adminController.deleteRating);

@@ -8,6 +8,7 @@ export interface AuthUser {
   role: Role;
   isVerified: boolean;
   isActive: boolean;
+  department?: string | null;
 }
 
 export interface AuthRequest extends Request {

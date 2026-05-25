@@ -1,142 +1,158 @@
-import 'dotenv/config';
-import { PrismaClient, Role, DoctorTier } from '@prisma/client';
-import bcrypt from 'bcryptjs';
+import "dotenv/config";
+import { PrismaClient, Role, DoctorTier } from "@prisma/client";
+import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('Seeding database...');
+  console.log("Seeding database...");
 
   // Admin user
-  const adminPassword = await bcrypt.hash('Peter@12345', 12);
+  const adminPassword = await bcrypt.hash("Peter@12345", 12);
   const admin = await prisma.user.upsert({
-    where: { email: 'pitermessay2020@gmail.com' },
+    where: { email: "pitermessay2020@gmail.com" },
     update: {},
     create: {
-      email: 'pitermessay2020@gmail.com',
-      username: 'admin',
+      email: "pitermessay2020@gmail.com",
+      username: "admin",
       passwordHash: adminPassword,
       role: Role.admin,
       isVerified: true,
     },
   });
-  console.log('Created admin:', admin.email);
+  console.log("Created admin:", admin.email);
 
   // Sample patient
-  const patientPassword = await bcrypt.hash('Evelyn@12345', 12);
+  const patientPassword = await bcrypt.hash("Evelyn@12345", 12);
   const patient = await prisma.user.upsert({
-    where: { email: 'petermesay7@gmail.com' },
+    where: { email: "petermesay7@gmail.com" },
     update: {},
     create: {
-      email: 'petermesay7@gmail.com',
-      username: 'john_patient',
+      email: "petermesay7@gmail.com",
+      username: "john_patient",
       passwordHash: patientPassword,
       role: Role.patient,
       isVerified: true,
       wallet: { create: { balance: 500 } },
     },
   });
-  console.log('Created patient:', patient.email);
+  console.log("Created patient:", patient.email);
 
-  // Doctor 1
-  const doctor1Password = await bcrypt.hash('Dani@12345', 12);
-  const doctor1 = await prisma.user.upsert({
-    where: { email: 'pimessay@gmail.com' },
+  // Student
+  const studentPassword = await bcrypt.hash("Kenu@12345", 12);
+  const student = await prisma.user.upsert({
+    where: { email: "petermesay777@gmail.com" },
     update: {},
     create: {
-      email: 'pimessay@gmail.com',
-      username: 'dr_kebede',
+      email: "petermesay777@gmail.com",
+      username: "student_peterm777",
+      passwordHash: studentPassword,
+      role: Role.student,
+      isVerified: true,
+      department: "medicine",
+    },
+  });
+  console.log('Created student:', student.email);
+
+  // Doctor 1
+  const doctor1Password = await bcrypt.hash("Dani@12345", 12);
+  const doctor1 = await prisma.user.upsert({
+    where: { email: "pimessay@gmail.com" },
+    update: {},
+    create: {
+      email: "pimessay@gmail.com",
+      username: "dr_kebede",
       passwordHash: doctor1Password,
       role: Role.doctor,
       isVerified: true,
       wallet: { create: { balance: 0 } },
       doctorProfile: {
         create: {
-          fullName: 'Dr. Kebede Tesfaye',
-          specialty: 'Internal Medicine',
+          fullName: "Dr. Kebede Tesfaye",
+          specialty: "Internal Medicine",
           experience: 10,
-          bio: 'Experienced internal medicine specialist with a broad clinical background.',
+          bio: "Experienced internal medicine specialist with a broad clinical background.",
           consultationFee: 150,
           tier: DoctorTier.Specialist,
-          certifications: ['MBBS', 'MD Cardiology'],
+          certifications: ["MBBS", "MD Cardiology"],
           availabilitySchedule: {
-            monday: ['09:00-12:00', '14:00-17:00'],
-            tuesday: ['09:00-12:00'],
-            wednesday: ['14:00-17:00'],
+            monday: ["09:00-12:00", "14:00-17:00"],
+            tuesday: ["09:00-12:00"],
+            wednesday: ["14:00-17:00"],
           },
         },
       },
     },
   });
-  console.log('Created doctor 1:', doctor1.email);
+  console.log("Created doctor 1:", doctor1.email);
 
   // Doctor 2
-  const doctor2Password = await bcrypt.hash('Doctor1234!', 12);
+  const doctor2Password = await bcrypt.hash("Doctor1234!", 12);
   const doctor2 = await prisma.user.upsert({
-    where: { email: 'dr.tigist@amu.edu' },
+    where: { email: "dr.tigist@amu.edu" },
     update: {},
     create: {
-      email: 'dr.tigist@amu.edu',
-      username: 'dr_tigist',
+      email: "dr.tigist@amu.edu",
+      username: "dr_tigist",
       passwordHash: doctor2Password,
       role: Role.doctor,
       isVerified: true,
       wallet: { create: { balance: 0 } },
       doctorProfile: {
         create: {
-          fullName: 'Dr. Tigist Alemu',
-          specialty: 'Pediatrics',
+          fullName: "Dr. Tigist Alemu",
+          specialty: "Pediatrics",
           experience: 7,
-          bio: 'Pediatrics specialist focused on child and adolescent care.',
+          bio: "Pediatrics specialist focused on child and adolescent care.",
           consultationFee: 120,
           tier: DoctorTier.Specialist,
-          certifications: ['MBBS', 'MD Pediatrics'],
+          certifications: ["MBBS", "MD Pediatrics"],
           availabilitySchedule: {
-            monday: ['10:00-13:00'],
-            thursday: ['09:00-12:00', '15:00-18:00'],
-            friday: ['09:00-12:00'],
+            monday: ["10:00-13:00"],
+            thursday: ["09:00-12:00", "15:00-18:00"],
+            friday: ["09:00-12:00"],
           },
         },
       },
     },
   });
-  console.log('Created doctor 2:', doctor2.email);
+  console.log("Created doctor 2:", doctor2.email);
 
   // Doctor 3
-  const doctor3Password = await bcrypt.hash('Doctor1234!', 12);
+  const doctor3Password = await bcrypt.hash("Doctor1234!", 12);
   const doctor3 = await prisma.user.upsert({
-    where: { email: 'dr.yonas@amu.edu' },
+    where: { email: "dr.yonas@amu.edu" },
     update: {},
     create: {
-      email: 'dr.yonas@amu.edu',
-      username: 'dr_yonas',
+      email: "dr.yonas@amu.edu",
+      username: "dr_yonas",
       passwordHash: doctor3Password,
       role: Role.doctor,
       isVerified: true,
       wallet: { create: { balance: 0 } },
       doctorProfile: {
         create: {
-          fullName: 'Dr. Yonas Bekele',
-          specialty: 'Surgery',
+          fullName: "Dr. Yonas Bekele",
+          specialty: "Surgery",
           experience: 15,
-          bio: 'Surgical specialist with extensive clinical and operative experience.',
+          bio: "Surgical specialist with extensive clinical and operative experience.",
           consultationFee: 80,
           tier: DoctorTier.SuperSpecialist,
-          certifications: ['MBBS', 'MS Surgery'],
+          certifications: ["MBBS", "MS Surgery"],
           availabilitySchedule: {
-            monday: ['08:00-12:00', '14:00-18:00'],
-            tuesday: ['08:00-12:00', '14:00-18:00'],
-            wednesday: ['08:00-12:00'],
-            thursday: ['08:00-12:00', '14:00-18:00'],
-            friday: ['08:00-12:00'],
+            monday: ["08:00-12:00", "14:00-18:00"],
+            tuesday: ["08:00-12:00", "14:00-18:00"],
+            wednesday: ["08:00-12:00"],
+            thursday: ["08:00-12:00", "14:00-18:00"],
+            friday: ["08:00-12:00"],
           },
         },
       },
     },
   });
-  console.log('Created doctor 3:', doctor3.email);
+  console.log("Created doctor 3:", doctor3.email);
 
-  console.log('Seeding complete!');
+  console.log("Seeding complete!");
 }
 
 main()

@@ -3,6 +3,21 @@ import { AuthRequest } from '../types';
 import { adminService } from '../services/admin.service';
 
 export const adminController = {
+  async createStudent(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const { email, username, password, department } = req.body as {
+        email: string;
+        username: string;
+        password: string;
+        department?: string;
+      };
+      const user = await adminService.createStudent(email, username, password, department || 'general');
+      res.status(201).json({ success: true, data: user });
+    } catch (err) {
+      const error = err as Error & { statusCode?: number };
+      res.status(error.statusCode || 500).json({ success: false, error: error.message });
+    }
+  },
   async listUsers(req: AuthRequest, res: Response): Promise<void> {
     try {
       const page = parseInt(req.query['page'] as string) || 1;

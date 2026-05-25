@@ -22,7 +22,11 @@ const doctorLinks = [
   { to: '/doctor/wallet', label: 'Wallet', icon: '💰' },
 ];
 
-const studentLinks = [{ to: '/student', label: 'Dashboard', icon: '🎓' }];
+const studentLinks = [
+  { to: '/student', label: 'Dashboard', icon: '🎓' },
+  { to: '/student/ai-assistant', label: 'AI Assistant', icon: '🤖' },
+  { to: '/student/courses', label: 'Course Materials', icon: '📚' },
+];
 
 const adminLinks = [
   { to: '/admin', label: 'Dashboard', icon: '🏠' },
