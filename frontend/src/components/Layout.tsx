@@ -18,6 +18,7 @@ const patientLinks = [
 const doctorLinks = [
   { to: '/doctor', label: 'Dashboard', icon: '🏠' },
   { to: '/doctor/profile', label: 'My Profile', icon: '👤' },
+  { to: '/doctor/ai-assistant', label: 'AI Assistant', icon: '🤖' },
   { to: '/doctor/consultations', label: 'Consultations', icon: '📋' },
   { to: '/doctor/wallet', label: 'Wallet', icon: '💰' },
 ];

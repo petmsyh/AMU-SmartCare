@@ -31,4 +31,4 @@ RUN npx prisma generate
 
 EXPOSE 5000
 
-CMD ["sh", "-c", "npm run db:setup && node dist/index.js"]
+CMD ["npm", "start"]

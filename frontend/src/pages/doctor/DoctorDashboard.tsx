@@ -28,6 +28,7 @@ const DoctorDashboard: React.FC = () => {
   ];
 
   const quickLinks = [
+    { to: '/doctor/ai-assistant', label: 'AI Assistant', desc: 'Ask clinical questions', icon: '🤖', colorCls: 'text-primary-500 bg-primary-50' },
     { to: '/doctor/profile', label: 'Update Profile', desc: 'Edit your doctor profile', icon: '👤', colorCls: 'text-primary-500 bg-primary-50' },
     { to: '/doctor/consultations', label: 'View Consultations', desc: 'Manage patient requests', icon: '📋', colorCls: 'text-success-500 bg-success-100' },
     { to: '/doctor/wallet', label: 'Wallet', desc: 'View earnings & withdraw', icon: '💰', colorCls: 'text-primary-900 bg-primary-50' },

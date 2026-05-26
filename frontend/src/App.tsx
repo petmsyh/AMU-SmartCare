@@ -24,6 +24,7 @@ import DoctorProfileForm from './pages/doctor/DoctorProfileForm';
 import DoctorConsultations from './pages/doctor/DoctorConsultations';
 import DoctorConsultationDetail from './pages/doctor/ConsultationDetail';
 import DoctorWallet from './pages/doctor/DoctorWallet';
+import DoctorAIAssistant from './pages/doctor/AIAssistant';
 
 import StudentDashboard from './pages/student/StudentDashboard';
 import StudentCourses from './pages/student/Courses';
@@ -161,6 +162,16 @@ const App: React.FC = () => {
             <ProtectedRoute allowedRoles={['doctor']}>
               <Layout>
                 <DoctorConsultations />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/doctor/ai-assistant"
+          element={
+            <ProtectedRoute allowedRoles={["doctor"]}>
+              <Layout>
+                <DoctorAIAssistant />
               </Layout>
             </ProtectedRoute>
           }

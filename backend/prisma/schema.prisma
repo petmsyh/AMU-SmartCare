@@ -27,6 +27,7 @@ model User {
   sentMessages         Message[]      @relation("SentMessages")
   wallet               Wallet?
   transactions         Transaction[]
+  aiChatSessions       AiChatSession[]
 }
 
 enum Role {
@@ -195,6 +196,35 @@ model CallSignal {
   type        CallSignalType
   payload     Json
   createdAt   DateTime      @default(now())
+}
+
+model AiChatSession {
+  id            String          @id @default(uuid())
+  userId        String
+  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title         String          @default("New chat")
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  messages      AiChatMessage[]
+
+  @@index([userId, updatedAt])
+}
+
+model AiChatMessage {
+  id          String         @id @default(uuid())
+  sessionId   String
+  session     AiChatSession   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  role        AiChatRole
+  content     String
+  createdAt   DateTime       @default(now())
+
+  @@index([sessionId, createdAt])
+}
+
+enum AiChatRole {
+  user
+  assistant
 }
 
 enum CallType {
