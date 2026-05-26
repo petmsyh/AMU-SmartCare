@@ -6,7 +6,7 @@ const LandingPage: React.FC = () => {
     { icon: '🔍', title: 'Find Specialists', desc: 'Browse verified doctors across all departments', color: 'text-primary-500', bg: 'bg-primary-50' },
     { icon: '📋', title: 'Book Consultations', desc: 'Schedule appointments and manage your journey', color: 'text-success-500', bg: 'bg-success-100' },
     { icon: '🤖', title: 'AI Health Assistant', desc: 'Get instant AI-powered guidance and analysis', color: 'text-purple-500', bg: 'bg-purple-100' },
-    { icon: '🎓', title: 'Student Resources', desc: 'Academic health assistant for medical students', color: 'text-accent-400', bg: 'bg-accent-50' },
+    { icon: '🎓', title: 'Student AI Assistant', desc: 'Curriculum-grounded AI for AMU medical students', color: 'text-accent-400', bg: 'bg-accent-50' },
     { icon: '💳', title: 'Secure Payments', desc: 'Safe payment system with escrow protection', color: 'text-danger-500', bg: 'bg-danger-100' },
     { icon: '🛡️', title: 'Admin Control', desc: 'Comprehensive platform management tools', color: 'text-primary-900', bg: 'bg-primary-50' },
   ];
@@ -65,6 +65,26 @@ const LandingPage: React.FC = () => {
               Sign In
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* ── STUDENT AI ASSISTANT (Polished) ─────────────────── */}
+      <section className="py-12 px-6 bg-white">
+          <div className="max-w-6xl mx-auto grid grid-cols-1 gap-8 items-center">
+          <div className="text-center max-w-2xl mx-auto">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-primary-900 mb-4">Student AI Assistant — Grounded in AMU Curriculum</h2>
+            <p className="text-gray-600 mb-6">The Student Dashboard includes an AI assistant trained on AMU medical curriculum to support coursework and clinical learning. Answers are curriculum-grounded and include references where available to reduce hallucination.</p>
+
+            {/* CTA buttons removed per request */}
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4 justify-items-center">
+              <div className="p-3 rounded-lg bg-gray-50 text-sm text-gray-700 shadow-sm">🎯 Curriculum-focused</div>
+              <div className="p-3 rounded-lg bg-gray-50 text-sm text-gray-700 shadow-sm">📚 Citation-aware answers</div>
+              <div className="p-3 rounded-lg bg-gray-50 text-sm text-gray-700 shadow-sm">🔒 Academic support</div>
+            </div>
+          </div>
+
+          {/* intentionally left blank: no right-column caption */}
         </div>
       </section>
 
