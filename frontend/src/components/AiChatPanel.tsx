@@ -379,7 +379,51 @@ const AiChatPanel: React.FC<AiChatPanelProps> = ({
           )}
         </div>
 
-        {/* Bottom composer removed — using the hero/top composer only */}
+        {messages.length > 0 && (
+          <div className="border-t border-gray-200 bg-white px-6 py-5">
+            {suggestedPrompts.length > 0 && (
+              <div className="mb-4 flex flex-wrap gap-2">
+                {suggestedPrompts.map((prompt) => (
+                  <button
+                    key={prompt}
+                    onClick={() => void handleSend(prompt)}
+                    disabled={loading}
+                    className="rounded-full border border-gray-200 bg-white px-4 py-2 text-sm text-gray-700 shadow-sm hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {prompt}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            <div className="flex items-end gap-3 rounded-[28px] border border-gray-200 bg-white px-4 py-3 shadow-2xl">
+              <button
+                onClick={() => void handleNewChat()}
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-gray-50 text-lg text-gray-700 hover:bg-gray-100"
+                title="New chat"
+              >
+                ＋
+              </button>
+              <textarea
+                value={input}
+                onChange={(event) => setInput(event.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder={placeholder}
+                rows={1}
+                className="min-h-[42px] flex-1 resize-none border-0 bg-transparent px-1 py-2 text-sm text-gray-900 placeholder:text-gray-400 outline-none"
+              />
+              <button
+                onClick={() => void handleSend()}
+                disabled={loading || !input.trim()}
+                className="h-11 rounded-full bg-primary-600 px-5 text-sm font-semibold text-white transition-opacity disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Send
+              </button>
+            </div>
+
+            <div className="mt-2 text-center text-[11px] text-gray-500">{subtitle}</div>
+          </div>
+        )}
       </main>
     </div>
   );
